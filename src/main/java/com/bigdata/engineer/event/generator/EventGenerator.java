@@ -33,6 +33,12 @@ public class EventGenerator {
                 e.getAccountID(e.getAccountNumber() == 0 ? EventOperations.getRandom(0, e.getAccountNumber()) : 0),
                 BankingConstants.DEPOSIT,1000)
         );
+
+        customerList.forEach(e-> bank.work(
+                e.getCustomerID(),
+                e.getAccountID(e.getAccountNumber() == 0 ? EventOperations.getRandom(0, e.getAccountNumber()) : 0),
+                BankingConstants.WITHDRAW,1000)
+        );
     }
 
     private void createCustomer(int number) {

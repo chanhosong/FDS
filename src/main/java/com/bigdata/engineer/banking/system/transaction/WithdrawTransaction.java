@@ -1,8 +1,16 @@
 package com.bigdata.engineer.banking.system.transaction;
 
-public class WithdrawTransaction extends Transactions{
+import com.bigdata.engineer.banking.system.database.BankDB;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-    private final int amount;
+import java.util.Map;
+
+public class WithdrawTransaction extends Transactions{
+    private static final Logger logger = LogManager.getLogger(WithdrawTransaction.class);
+
+    private Map<String, Map<String, Integer>> bankDB = BankDB.getInstance().getAccountList();//customerid, account
+    private int amount;
 
     public WithdrawTransaction(int amount) {
         super(amount);
@@ -10,7 +18,7 @@ public class WithdrawTransaction extends Transactions{
     }
 
     @Override
-    public int debitAmount(String accountID) {
-    return amount;
+    public int debitAmount(String customerID, String accountID) {
+        return amount;
     }//출금잔고
 }

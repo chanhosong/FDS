@@ -7,17 +7,13 @@ import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static com.bigdata.engineer.banking.system.Account.getBalance;
+import java.util.*;
 
 public class Bank {
     private static final Logger logger = LogManager.getLogger(Bank.class);
 
     private static Bank instance = new Bank();
-    private Map<String, List<Account>> bankDB = BankDB.getInstance().getAccountList();//customerid, account
+    private Map<String, Map<String, Integer>> bankDB = BankDB.getInstance().getAccountList();//customerid, account
 
     private Bank () {
         logger.info(BankingConstants.LOG_APPENDER + "Bank Open!");
@@ -35,7 +31,7 @@ public class Bank {
         customer.setAccountID(addBankDB(customer.getCustomerID(), account));
 
         if(logger.isDebugEnabled()){
-            logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is assigned AccountID: {}, Init Deposit : {}", customer.getCustomerID(), account.getAccountID(), getBalance(account.getAccountID()));
+            logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is assigned AccountID: {}, Init Deposit : {}", customer.getCustomerID(), account.getAccountID(), account.getBalance());
         }
 
         return customer;
@@ -47,9 +43,11 @@ public class Bank {
 
     private String addBankDB(String custormerID, Account account) {
         if(bankDB.get(custormerID) != null){
-            bankDB.get(custormerID).add(account);
+            bankDB.get(custormerID).put(account.getAccountID(), account.getBalance());
         } else {
-            bankDB.put(custormerID, Collections.singletonList(account));
+            Map<String, Integer> accountInfo = new HashMap<>();
+            accountInfo.put(account.getAccountID(), account.getBalance());
+            bankDB.put(custormerID, accountInfo);
         }
 
         return account.getAccountID();
