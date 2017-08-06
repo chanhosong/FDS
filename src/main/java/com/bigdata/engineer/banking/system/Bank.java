@@ -42,7 +42,7 @@ public class Bank {
     }
 
     public void work(String customerID, String accountID, String work, int amount) {
-        BankDB.getInstance().runTransactions(customerID, accountID, new Transactions(amount).getTransactionType(work));
+        BankDB.getInstance().runTransactions(customerID, accountID, new Transactions(amount).getTransactionWorkType(work));
     }
 
     private String addBankDB(String custormerID, Account account) {

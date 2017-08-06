@@ -10,7 +10,7 @@ public class Transactions {
         this.amount = amount;
     }
 
-    public Transactions getTransactionType(String type) {
+    public Transactions getTransactionWorkType(String type) {
         switch (type) {
             case BankingConstants.DEPOSIT : return new DepositTransaction(this.amount);
             case BankingConstants.WITHDRAW : return new WithdrawTransaction(this.amount);
