@@ -3,12 +3,13 @@ package com.bigdata.engineer.banking.system;
 import com.bigdata.engineer.banking.system.config.BankingConstants;
 import com.bigdata.engineer.banking.system.database.BankDB;
 import com.bigdata.engineer.banking.system.transaction.Transactions;
-import com.bigdata.engineer.banking.system.transaction.WithdrawTransaction;
 import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static com.bigdata.engineer.banking.system.Account.getBalance;
 
@@ -40,6 +41,10 @@ public class Bank {
         return customer;
     }
 
+    public void work(String customerID, String accountID, String work, int amount) {
+        BankDB.getInstance().runTransactions(customerID, accountID, new Transactions(amount).getTransactionType(work));
+    }
+
     private String addBankDB(String custormerID, Account account) {
         if(bankDB.get(custormerID) != null){
             bankDB.get(custormerID).add(account);
@@ -48,20 +53,5 @@ public class Bank {
         }
 
         return account.getAccountID();
-    }
-
-    public void runTransactions(String customerID, String accountID, Transactions transaction) {
-        int balance = 0;
-        if(transaction instanceof WithdrawTransaction) {
-            balance = transaction.debitAmount(accountID);//출금잔고
-            if (logger.isDebugEnabled()){
-                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is withdrew AccountID: {}, debitAmount : {}", customerID, accountID, balance);
-            }
-        } else {
-            balance = transaction.creditAmount(accountID);//입금잔고
-            if (logger.isDebugEnabled()){
-                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is Deposited AccountID: {}, creditAmount : {}", customerID, accountID, balance);
-            }
-        }
     }
 }

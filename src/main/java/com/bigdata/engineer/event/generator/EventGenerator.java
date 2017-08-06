@@ -1,7 +1,7 @@
 package com.bigdata.engineer.event.generator;
 
 import com.bigdata.engineer.banking.system.Bank;
-import com.bigdata.engineer.banking.system.transaction.DepositTransaction;
+import com.bigdata.engineer.banking.system.config.BankingConstants;
 import com.bigdata.engineer.event.generator.eventunit.config.CustomerConstants;
 import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
 import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
@@ -27,10 +27,11 @@ public class EventGenerator {
         this.createCustomer(3);
         //2.create account: 모든 고객에 대해서 계좌를 1개씩 계설한다
         customerList.forEach(e-> bank.createAccount(e, EventOperations.getRandom(0,10000)));
-        //3.deposit account: 모든 고객에 대해서 랜덤한 보유계좌에 입금한다
-        customerList.forEach(e-> bank.runTransactions(e.getCustomerID(),
+        //3.deposit account: 모든 고객에 대해서 랜덤 보유계좌에 입금한다
+        customerList.forEach(e-> bank.work(
+                e.getCustomerID(),
                 e.getAccountID(e.getAccountNumber() == 0 ? EventOperations.getRandom(0, e.getAccountNumber()) : 0),
-                new DepositTransaction(1000))
+                BankingConstants.DEPOSIT,1000)
         );
     }
 

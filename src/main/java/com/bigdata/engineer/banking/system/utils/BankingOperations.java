@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.Instant;
 
-public class AccountOperations {
+public class BankingOperations {
     public static String getTimestamp() {
         return String.valueOf(Instant.now().toEpochMilli());
     }
