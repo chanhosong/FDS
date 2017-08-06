@@ -1,0 +1,9 @@
+com/bigdata/engineer/fds/kafka/KafkaConsumer.class
+com/bigdata/engineer/fds/kafka/processor/MyProcessorSupplier$1.class
+com/bigdata/engineer/fds/kafka/config/KafkaConsumerConfiguration.class
+com/bigdata/engineer/fds/kafka/processor/MyProcessorSupplier.class
+com/bigdata/engineer/fds/kafka/KafkaConsumer$1.class
+com/bigdata/engineer/fds/kafka/config/KafkaConsumerConstants.class
+com/bigdata/engineer/fds/kafka/internal/MessageSerializerType.class
+com/bigdata/engineer/fds/Bootstrap.class
+com/bigdata/engineer/fds/kafka/config/KafkaConfigOperations.class
