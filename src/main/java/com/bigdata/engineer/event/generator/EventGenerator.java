@@ -18,13 +18,15 @@ public class EventGenerator {
 
     private String timeStamp = EventOperations.getTimestamp();
     private List<Customer> customerList = new ArrayList<>();
+    private static final int numberOfCustomer = 3;
 
-    public void init() {
-        if(logger.isDebugEnabled()){
-            logger.debug(CustomerConstants.LOG_APPENDER + "EventGenerator is started!");
-        }
+    public EventGenerator() {
+        logger.info(CustomerConstants.LOG_APPENDER + "EventGenerator is started!");
+    }
+
+    public void run() {
         //1.create customer
-        this.createCustomer(3);
+        this.createCustomer(numberOfCustomer);
         //2.create account: 모든 고객에 대해서 계좌를 1개씩 계설한다
         customerList.forEach(e-> bank.createAccount(e, EventOperations.getRandom(0,10000)));
         //3.deposit account: 모든 고객에 대해서 랜덤 보유계좌에 입금한다
@@ -33,11 +35,17 @@ public class EventGenerator {
                 e.getAccountID(e.getAccountNumber() == 0 ? EventOperations.getRandom(0, e.getAccountNumber()) : 0),
                 BankingConstants.DEPOSIT,1000)
         );
-
+        //4.withdraw account: 모든 고객에 대해서 랜덤 보유계좌에 출금한다
         customerList.forEach(e-> bank.work(
                 e.getCustomerID(),
                 e.getAccountID(e.getAccountNumber() == 0 ? EventOperations.getRandom(0, e.getAccountNumber()) : 0),
                 BankingConstants.WITHDRAW,1000)
+        );
+        //5.transfer account: 모든 고객에 대해서 랜덤 보유계좌에 이체한다
+        customerList.forEach(e-> bank.work(
+                e.getCustomerID(),
+                e.getAccountID(e.getAccountNumber() == 0 ? EventOperations.getRandom(0, e.getAccountNumber()) : 0),
+                BankingConstants.TRANSFER,1000)
         );
     }
 

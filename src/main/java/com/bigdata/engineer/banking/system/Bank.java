@@ -7,7 +7,8 @@ import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Bank {
     private static final Logger logger = LogManager.getLogger(Bank.class);

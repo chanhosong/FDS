@@ -45,7 +45,7 @@ public class BankDB {
         } else if(transaction instanceof TransferTransaction) {
             balance = transaction.debitAmount(customerID, accountID);//이체잔고
             if (logger.isDebugEnabled()){
-                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is Transferred AccountID: {}, creditAmount : {}", customerID, accountID, balance);
+                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is Transferred AccountID: {}, debitAmount : {}", customerID, accountID, balance);
             }
         }
     }
