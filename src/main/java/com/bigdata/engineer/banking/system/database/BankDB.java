@@ -14,8 +14,9 @@ import java.util.Map;
 public class BankDB {
     private static final Logger logger = LogManager.getLogger(BankDB.class);
 
+    private String bankID = "";
     private static BankDB instance = new BankDB();
-    private Map<String, Map<String, Integer>> accountList = new HashMap<>();//customerid, account, balance
+    private Map<String, Map<String, Integer>> bankingData = new HashMap<>();//customerid, account, balance
 
     private BankDB () {}
 
@@ -26,26 +27,33 @@ public class BankDB {
         return instance;
     }
 
-    public Map<String, Map<String, Integer>> getAccountList() {
-        return accountList;
+    public Map<String, Map<String, Integer>> getBankingData() {
+        return bankingData;
     }
 
+    /**
+     * Running the transactions.
+     *
+     * @param customerID
+     * @param accountID
+     * @param transaction
+     */
     public void runTransactions(String customerID, String accountID, Transactions transaction) {
         int balance = 0;
         if(transaction instanceof WithdrawTransaction) {
             balance = transaction.debitAmount(customerID, accountID);//출금잔고
             if (logger.isDebugEnabled()){
-                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is withdrew AccountID: {}, debitAmount : {}", customerID, accountID, balance);
+                logger.debug(BankingConstants.LOG_APPENDER + "'{}' Bank : CustomerID '{}' is withdrew AccountID: {}, debitAmount : {}", bankID, customerID, accountID, balance);
             }
         } else if(transaction instanceof DepositTransaction) {
             balance = transaction.creditAmount(customerID, accountID);//입금잔고
             if (logger.isDebugEnabled()){
-                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is Deposited AccountID: {}, creditAmount : {}", customerID, accountID, balance);
+                logger.debug(BankingConstants.LOG_APPENDER + "'{}' Bank : CustomerID '{}' is Deposited AccountID: {}, creditAmount : {}", bankID, customerID, accountID, balance);
             }
         } else if(transaction instanceof TransferTransaction) {
             balance = transaction.debitAmount(customerID, accountID);//이체잔고
             if (logger.isDebugEnabled()){
-                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is Transferred AccountID: {}, debitAmount : {}", customerID, accountID, balance);
+                logger.debug(BankingConstants.LOG_APPENDER + "'{}' Bank : CustomerID '{}' is Transferred AccountID: {}, debitAmount : {}", bankID, customerID, accountID, balance);
             }
         }
     }

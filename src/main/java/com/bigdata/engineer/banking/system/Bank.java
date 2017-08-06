@@ -4,6 +4,7 @@ import com.bigdata.engineer.banking.system.config.BankingConstants;
 import com.bigdata.engineer.banking.system.database.BankDB;
 import com.bigdata.engineer.banking.system.transaction.Transactions;
 import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
+import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,18 +14,11 @@ import java.util.Map;
 public class Bank {
     private static final Logger logger = LogManager.getLogger(Bank.class);
 
-    private static Bank instance = new Bank();
-    private Map<String, Map<String, Integer>> bankDB = BankDB.getInstance().getAccountList();//customerid, account
+    private String bankID = EventOperations.getCustomerIDGenerator(6,4);
+    private Map<String, Map<String, Integer>> bankDB = BankDB.getInstance().getBankingData();//customerid, account
 
-    private Bank () {
-        logger.info(BankingConstants.LOG_APPENDER + "Bank Open!");
-    }
-
-    public static Bank getInstance() {
-        if(instance == null) {
-            return instance = new Bank();
-        }
-        return instance;
+    public Bank () {
+        logger.info(BankingConstants.LOG_APPENDER + "'{}' Bank Open!", bankID);
     }
 
     public Customer createAccount(Customer customer, int initialDeposit) {
@@ -32,7 +26,7 @@ public class Bank {
         customer.setAccountID(addBankDB(customer.getCustomerID(), account));
 
         if(logger.isDebugEnabled()){
-            logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is assigned AccountID: {}, Init Deposit : {}", customer.getCustomerID(), account.getAccountID(), account.getBalance());
+            logger.debug(BankingConstants.LOG_APPENDER + "'{}' Bank : CustomerID '{}' is assigned AccountID: {}, Init Deposit : {}", bankID, customer.getCustomerID(), account.getAccountID(), account.getBalance());
         }
 
         return customer;
