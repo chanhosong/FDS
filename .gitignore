@@ -5,6 +5,7 @@
 
 # Log file
 *.log
+*.log.gz
 
 # BlueJ files
 *.ctxt
@@ -24,3 +25,4 @@
 hs_err_pid*
 
 .idea/
+.DS_Store
