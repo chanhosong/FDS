@@ -36,7 +36,6 @@ public class Bank {
         Map<String, Integer> dbAccess = bankDB.get(customerID);
 
         if(dbAccess == null){
-            logger.warn(account.getAccountID());
             Map<String, Integer> accountInfo = new HashMap<>();
             accountInfo.put(account.getAccountID(), account.getBalance());
             bankDB.put(customerID, accountInfo);//register customerid and accountid
@@ -47,10 +46,7 @@ public class Bank {
         return account.getAccountID();
     }
 
-    public void work(String customerID, String sourceBankID, String sourceAccountID, String targetBankID, String targetAccountID, String work, int amount) {
-        if(logger.isDebugEnabled()) {
-//            logger.warn("Banking Work was ready : CustomerID : {} SourceBank : {} sourceAccountID : {} TargetBank : {}  TargetAccountID : {} Work : {} Amount : {}", customerID, this.bankID, sourceAccountID, targetBankID, targetAccountID, work, amount);
-        }
-        BankDB.getInstance().runTransactions(customerID, sourceBankID, sourceAccountID, targetBankID, targetAccountID, new TransactionsImpl(targetBankID, amount).getTransactionWorkType(work));
+    public void work(String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID, String work, int amount) {
+        BankDB.getInstance().runTransactions(customerID, sourceBankID, sourceAccountID, targetCustomerID, targetBankID, targetAccountID, new TransactionsImpl(targetBankID, amount).getTransactionWorkType(work));
     }
 }

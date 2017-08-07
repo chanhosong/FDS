@@ -28,15 +28,14 @@ public class TransferTransaction extends TransactionsImpl {
      */
 
     @Override
-    public void transferAmount(String customerID, String sourceBankID, String sourceAccountID, String targetBankID, String targetAccountID) {
+    public void transferAmount(String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID) {
         int debitAmount = super.debitAmount(customerID, sourceBankID, sourceAccountID);//1. 먼저 출금을 한다
         int creditAmount = super.creditAmount(customerID, targetBankID, targetAccountID);//2. 다음 입금을 한다
 
         if (logger.isDebugEnabled()){
-//                logger.debug(BankingConstants.TRANSACTION_LOG_APPENDER + "CustomerID '{}' transferred '${}' from '{}' bank '{}' (Before balance '${}' After balance : '{}') to '{}' bank '{}' (Before balance '{}' After balance : '{}')", customerID, amount, sourceBankID, sourceAccountID, this.bankName, targetAccountID, balance);
             logger.debug(BankingConstants.TRANSACTION_LOG_APPENDER +
-                    "CustomerID '{}' transferred '${}' from '{}' bank '{}' (Before balance '${}' After balance : '${}') to '{}' bank '{}' (Before balance '${}' After balance : '${}')"
-                    , customerID, amount, sourceBankID, sourceAccountID, debitAmount+amount, debitAmount, this.bankName, targetAccountID, creditAmount-amount, creditAmount);
+                    "CustomerID '{}' transferred '${}' from '{}' bank '{}' (Before balance '${}' After balance : '${}') to CustomerID '{}' of '{}' bank '{}' (Before balance '${}' After balance : '${}')"
+                    , customerID, amount, sourceBankID, sourceAccountID, debitAmount+amount, debitAmount, targetCustomerID, this.bankName, targetAccountID, creditAmount-amount, creditAmount);
         }
     }
 }

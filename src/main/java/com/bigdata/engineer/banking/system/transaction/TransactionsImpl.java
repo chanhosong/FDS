@@ -51,5 +51,5 @@ public class TransactionsImpl implements Transactions {
     }
 
     @Override
-    public void transferAmount(String customerID, String sourceBankID, String sourceAccountID, String targetBankID, String targetAccountID) {}
+    public void transferAmount(String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID) {}
 }

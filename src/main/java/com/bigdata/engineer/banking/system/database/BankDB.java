@@ -38,13 +38,13 @@ public class BankDB {
         return this.allBankData.get(bankID);
     }
 
-    public void runTransactions(String customerID, String sourceBankID, String sourceAccountID, String targetBankID, String targetAccountID, TransactionsImpl transaction) {
+    public void runTransactions(String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID, TransactionsImpl transaction) {
         if(transaction instanceof WithdrawTransaction) {
             transaction.debitAmount(customerID, sourceBankID, sourceAccountID);//출금잔고
         } else if(transaction instanceof DepositTransaction) {
             transaction.creditAmount(customerID, sourceBankID, sourceAccountID);//입금잔고
         } else if(transaction instanceof TransferTransaction) {
-            transaction.transferAmount(customerID, sourceBankID, sourceAccountID, targetBankID, targetAccountID);//이체잔고
+            transaction.transferAmount(customerID, sourceBankID, sourceAccountID, targetCustomerID, targetBankID, targetAccountID);//이체잔고
         }
     }
 }
