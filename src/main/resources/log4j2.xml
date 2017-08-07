@@ -10,7 +10,7 @@
             <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %logger{36} : %msg%n"/>
         </Console>
 
-        <RollingFile name="filelog" fileName="${logpath}/${filename}.log" filePattern="${logpath}/${filename}.%d{yyyy-MM-dd}.log.gz">
+        <RollingFile name="Filelog" fileName="${logpath}/${filename}.log" filePattern="${logpath}/${filename}.%d{yyyy-MM-dd}.log.gz">
             <PatternLayout>
                 <pattern>%d %5p [%c] %m%n</pattern>
             </PatternLayout>
@@ -23,12 +23,13 @@
     <Loggers>
         <Root level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="Filelog" level="DEBUG"/>
         </Root>
         <Logger name="com.bigdata.engineer.fds" level="DEBUG">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="com.bigdata.engineer.fds" level="DEBUG" additivity="false">
-            <AppenderRef ref="filelog" level="DEBUG"/>
+        <Logger name="com.bigdata.engineer.fds" level="DEBUG">
+            <AppenderRef ref="Filelog" level="DEBUG"/>
         </Logger>
     </Loggers>
 </Configuration>

@@ -1,18 +1,14 @@
 package com.bigdata.engineer.banking.system;
 
-import com.bigdata.engineer.banking.system.transaction.Transactions;
 import com.bigdata.engineer.banking.system.utils.BankingOperations;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Account {
     private static final Logger logger = LogManager.getLogger(Account.class);
 
-    private static final Map<String, Integer> accountData = new HashMap<>();//accountid and balance
     private String accountID = "";
+    private int balance = 0;
 
     public Account(int initialDeposit) {
         this.createAccount(initialDeposit);
@@ -20,32 +16,14 @@ public class Account {
 
     private void createAccount(int initialDeposit) {
         this.accountID = BankingOperations.getAccountIDGenerator(30, 4);
-        this.accountData.put(accountID, initialDeposit);
+        this.balance = initialDeposit;
     }
 
     public String getAccountID() {
         return accountID;
     }
 
-    public static int getBalance(String accountID) {
-        return accountData.get(accountID);
+    public int getBalance() {
+        return this.balance;
     }
-
-//    public double getBalance() {
-//        double balance = 0;
-//        for (Transaction transaction : Bank.getInstance().getTransactions(accountData)) {
-//          balance += transaction.creditAmount() - transaction.debitAmount();
-//        }
-//        return balance;
-//    }
-
-    public void addTransaction(Transactions transactions) {
-//      Bank.getInstance().runTransactions(, transaction);
-    }
-
-//    public void transfer(String fromAccountId, double amount) {
-//        Account fromAccount = Account.getAccountID(fromAccountId);
-//        addTransaction(new WithdrawTransaction(amount));
-//        fromAccount.addTransaction(new DepositTransaction(amount));
-//    }
 }

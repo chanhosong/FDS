@@ -5,14 +5,14 @@ import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Customer {
     private static final Logger logger = LogManager.getLogger(Customer.class);
 
     private String customerID;
-    private List<String> accountID = new ArrayList<>();
+    private Map<String, String> accountID = new HashMap<>();//bankid, accountid
 
     public Customer() {
         this.createCustomerID();
@@ -22,16 +22,20 @@ public class Customer {
         return customerID;
     }
 
-    public String getAccountID(int index) {
-        return accountID.get(index);
+    public Map<String, String> getAccountID() {
+        return accountID;
+    }
+
+    public String getAccountID(String bankID) {
+        return accountID.get(bankID);
     }
 
     public int getAccountNumber() {
         return accountID.size();
     }
 
-    public void setAccountID(String accountID) {
-        this.accountID.add(accountID);
+    public void setAccountID(String bankID, String accountID) {
+        this.accountID.put(bankID, accountID);
     }
 
     private void createCustomerID() {

@@ -1,23 +1,23 @@
 package com.bigdata.engineer.banking.system.database;
 
-import com.bigdata.engineer.banking.system.Account;
-import com.bigdata.engineer.banking.system.config.BankingConstants;
 import com.bigdata.engineer.banking.system.transaction.DepositTransaction;
-import com.bigdata.engineer.banking.system.transaction.Transactions;
+import com.bigdata.engineer.banking.system.transaction.TransactionsImpl;
 import com.bigdata.engineer.banking.system.transaction.TransferTransaction;
 import com.bigdata.engineer.banking.system.transaction.WithdrawTransaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class BankDB {
     private static final Logger logger = LogManager.getLogger(BankDB.class);
 
-    private static BankDB instance = new BankDB();
-    private Map<String, List<Account>> accountList = new HashMap<>();//customerid, account
+    private String bankName = "";
+    private static BankDB instance;
+    private Map<String, Map<String, Map<String, Integer>>> allBankData = new HashMap<>();//store allBankData
+    private Map<String, Map<String, Integer>> bankingData = new HashMap<>();//store customerID, accountID, balance
+
 
     private BankDB () {}
 
@@ -28,27 +28,23 @@ public class BankDB {
         return instance;
     }
 
-    public Map<String, List<Account>> getAccountList() {
-        return accountList;
+    public Map<String, Map<String, Map<String, Integer>>> getAllBankData() {
+        return allBankData;
     }
 
-    public void runTransactions(String customerID, String accountID, Transactions transaction) {
-        int balance = 0;
+    public Map<String, Map<String, Integer>> getBankingData(String bankID) {
+        this.bankName = bankID;
+        this.allBankData.put(bankID, bankingData);
+        return this.allBankData.get(bankID);
+    }
+
+    public void runTransactions(String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID, TransactionsImpl transaction) {
         if(transaction instanceof WithdrawTransaction) {
-            balance = transaction.debitAmount(accountID);//출금잔고
-            if (logger.isDebugEnabled()){
-                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is withdrew AccountID: {}, debitAmount : {}", customerID, accountID, balance);
-            }
+            transaction.debitAmount(customerID, sourceBankID, sourceAccountID);//출금잔고
         } else if(transaction instanceof DepositTransaction) {
-            balance = transaction.creditAmount(accountID);//입금잔고
-            if (logger.isDebugEnabled()){
-                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is Deposited AccountID: {}, creditAmount : {}", customerID, accountID, balance);
-            }
+            transaction.creditAmount(customerID, sourceBankID, sourceAccountID);//입금잔고
         } else if(transaction instanceof TransferTransaction) {
-            balance = transaction.debitAmount(accountID);//이체잔고
-            if (logger.isDebugEnabled()){
-                logger.debug(BankingConstants.LOG_APPENDER + "CustomerID '{}' is Transferred AccountID: {}, creditAmount : {}", customerID, accountID, balance);
-            }
+            transaction.transferAmount(customerID, sourceBankID, sourceAccountID, targetCustomerID, targetBankID, targetAccountID);//이체잔고
         }
     }
 }
