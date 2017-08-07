@@ -1,8 +1,0 @@
-com/bigdata/engineer/fds/event/test/generator/NewAccountEvent.class
-com/bigdata/engineer/fds/event/test/generator/WithdrawEvent.class
-com/bigdata/engineer/fds/event/test/kafka/KafkaPublisher.class
-com/bigdata/engineer/fds/event/test/generator/TransferEvent.class
-com/bigdata/engineer/fds/event/test/internal/MessageSerializerType.class
-com/bigdata/engineer/fds/event/test/generator/DepositEvent.class
-com/bigdata/engineer/fds/event/test/main/TestMain.class
-com/bigdata/engineer/fds/kafka/KafkaConsumerTest.class
