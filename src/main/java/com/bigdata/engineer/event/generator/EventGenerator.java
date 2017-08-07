@@ -18,8 +18,8 @@ public class EventGenerator {
     private String timeStamp = EventOperations.getTimestamp();
     private List<Bank> bankList = new ArrayList<>();
     private List<Customer> customerList = new ArrayList<>();
-    private static final int numberOfBank = 3;
-    private static final int numberOfCustomer = 3;
+    private static final int numberOfBank = 2;
+    private static final int numberOfCustomer = 2;
 
     public EventGenerator() {
         logger.info(CustomerConstants.LOG_APPENDER + "EventGenerator is started!");
@@ -30,25 +30,24 @@ public class EventGenerator {
         this.createBank(numberOfBank);
         this.createCustomer(numberOfCustomer);
         //2.create account: 모든 고객이 각 은행에 대해서 계좌를 1개씩 계설한다
-        customerList.forEach(e-> bankList.forEach(f->f.createAccount(e, EventOperations.getRandom(0,10000))));
+        customerList.forEach(consumer-> bankList.forEach(bank->bank.createAccount(consumer, EventOperations.getRandom(0,10000))));
         //3.deposit account: 모든 고객에 대해서 랜덤 보유계좌에 입금한다
-        customerList.forEach(e-> bankList.forEach(f->f.work(
-                e.getCustomerID(),
-                e.getAccountID(e.getAccountNumber() == 0 ? EventOperations.getRandom(0, e.getAccountNumber()) : 0),
-                BankingConstants.DEPOSIT,1000)
-        ));
+        //Random Account : EventOperations.getRandom(0, e.getAccountNumber()-1)
+        customerList.forEach(customer->
+            customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->bank.work(
+                customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, BankingConstants.DEPOSIT, 1000
+            ))));
         //4.withdraw account: 모든 고객에 대해서 랜덤 보유계좌에 출금한다
-        customerList.forEach(e-> bankList.forEach(f->f.work(
-                e.getCustomerID(),
-                e.getAccountID(e.getAccountNumber() == 0 ? EventOperations.getRandom(0, e.getAccountNumber()) : 0),
-                BankingConstants.WITHDRAW,1000)
-        ));
+        customerList.forEach(customer->
+            customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->bank.work(
+                customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, BankingConstants.WITHDRAW, 1000
+            ))));
+
         //5.transfer account: 모든 고객에 대해서 랜덤 보유계좌에 이체한다
-        customerList.forEach(e-> bankList.forEach(f->f.work(
-                e.getCustomerID(),
-                e.getAccountID(e.getAccountNumber() == 0 ? EventOperations.getRandom(0, e.getAccountNumber()) : 0),
-                BankingConstants.TRANSFER,1000)
-        ));
+        customerList.forEach(customer->
+                customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->bank.work(
+                        customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), sourceBankID, customer.getAccountID(sourceBankID), BankingConstants.TRANSFER, 1000
+                ))));
     }
 
     private void createBank(int number) {

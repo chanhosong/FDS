@@ -2,7 +2,7 @@ package com.bigdata.engineer.banking.system;
 
 import com.bigdata.engineer.banking.system.config.BankingConstants;
 import com.bigdata.engineer.banking.system.database.BankDB;
-import com.bigdata.engineer.banking.system.transaction.Transactions;
+import com.bigdata.engineer.banking.system.transaction.TransactionsImpl;
 import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
 import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +15,7 @@ public class Bank {
     private static final Logger logger = LogManager.getLogger(Bank.class);
 
     private String bankID = EventOperations.getCustomerIDGenerator(6,4);
-    private Map<String, Map<String, Integer>> bankDB = BankDB.getInstance().getBankingData();//customerid, account
+    private Map<String, Map<String, Integer>> bankDB = BankDB.getInstance().getBankingData(bankID);//customerid, account
 
     public Bank () {
         logger.info(BankingConstants.LOG_APPENDER + "'{}' Bank Open!", bankID);
@@ -23,7 +23,7 @@ public class Bank {
 
     public Customer createAccount(Customer customer, int initialDeposit) {
         Account account = new Account(initialDeposit);
-        customer.setAccountID(addBankDB(customer.getCustomerID(), account));
+        customer.setAccountID(bankID, registerAccountOnBankDB(customer.getCustomerID(), account));
 
         if(logger.isDebugEnabled()){
             logger.debug(BankingConstants.LOG_APPENDER + "'{}' Bank : CustomerID '{}' is assigned AccountID: {}, Init Deposit : {}", bankID, customer.getCustomerID(), account.getAccountID(), account.getBalance());
@@ -32,19 +32,25 @@ public class Bank {
         return customer;
     }
 
-    public void work(String customerID, String accountID, String work, int amount) {
-        BankDB.getInstance().runTransactions(customerID, accountID, new Transactions(amount).getTransactionWorkType(work));
-    }
+    private String registerAccountOnBankDB(String customerID, Account account) {
+        Map<String, Integer> dbAccess = bankDB.get(customerID);
 
-    private String addBankDB(String custormerID, Account account) {
-        if(bankDB.get(custormerID) != null){
-            bankDB.get(custormerID).put(account.getAccountID(), account.getBalance());
-        } else {
+        if(dbAccess == null){
+            logger.warn(account.getAccountID());
             Map<String, Integer> accountInfo = new HashMap<>();
             accountInfo.put(account.getAccountID(), account.getBalance());
-            bankDB.put(custormerID, accountInfo);
+            bankDB.put(customerID, accountInfo);//register customerid and accountid
+        } else {//accountid가 이미 있다면
+            dbAccess.put(account.getAccountID(), account.getBalance());
         }
 
         return account.getAccountID();
+    }
+
+    public void work(String customerID, String sourceBankID, String sourceAccountID, String targetBankID, String targetAccountID, String work, int amount) {
+        if(logger.isDebugEnabled()) {
+//            logger.warn("Banking Work was ready : CustomerID : {} SourceBank : {} sourceAccountID : {} TargetBank : {}  TargetAccountID : {} Work : {} Amount : {}", customerID, this.bankID, sourceAccountID, targetBankID, targetAccountID, work, amount);
+        }
+        BankDB.getInstance().runTransactions(customerID, sourceBankID, sourceAccountID, targetBankID, targetAccountID, new TransactionsImpl(targetBankID, amount).getTransactionWorkType(work));
     }
 }
