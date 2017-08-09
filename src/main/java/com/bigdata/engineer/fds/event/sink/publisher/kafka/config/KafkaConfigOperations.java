@@ -67,10 +67,10 @@ public class KafkaConfigOperations {
 
         } catch (FileNotFoundException ex) {
             logger.error(KafkaPublisherConstants.LOG_APPENDER + "Unable to find {} file at: {}", propertiesFileName, propertiesFileName);
-            configuration = setDefaultConsumerConfigs();
+            configuration = setDefaultPublisherConfigs();
         } catch (IOException ex) {
             logger.error(KafkaPublisherConstants.LOG_APPENDER + "Error occurred whilst trying to fetch '{}' from: {}", propertiesFileName, propertiesFileName);
-            configuration = setDefaultConsumerConfigs();
+            configuration = setDefaultPublisherConfigs();
         } finally {
             if (propertiesInputStream != null) {
                 try {
@@ -89,7 +89,7 @@ public class KafkaConfigOperations {
      *
      * @return an object of KafkaPublisherConstants class including all default Kafka Publisher specific configs.
      */
-    private static KafkaPublisherConfiguration setDefaultConsumerConfigs() {
+    private static KafkaPublisherConfiguration setDefaultPublisherConfigs() {
         logger.warn(KafkaPublisherConstants.LOG_APPENDER + "Default Values are being set to all Kafka Publisher specific configurations");
 
         KafkaPublisherConfiguration configuration = new KafkaPublisherConfiguration();

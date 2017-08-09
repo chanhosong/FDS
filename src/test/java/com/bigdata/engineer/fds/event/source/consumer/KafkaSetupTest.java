@@ -10,7 +10,7 @@
 //import org.I0Itec.zkclient.ZkClient;
 //import org.apache.kafka.clients.consumer.ConsumerRecord;
 //import org.apache.kafka.clients.consumer.ConsumerRecords;
-//import org.apache.kafka.clients.producer.KafkaProducer;
+//import org.apache.kafka.clients.producer.KafkaProducerHandler;
 //import org.apache.kafka.clients.producer.ProducerRecord;
 //import org.apache.kafka.common.utils.MockTime;
 //import org.apache.kafka.common.utils.Time;
@@ -58,7 +58,7 @@
 //        producerProps.setProperty("bootstrap.servers", BROKERHOST + ":" + BROKERPORT);
 //        producerProps.setProperty("key.serializer","org.apache.kafka.common.serialization.IntegerSerializer");
 //        producerProps.setProperty("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
-//        KafkaProducer<Integer, byte[]> producer = new KafkaProducer<Integer, byte[]>(producerProps);
+//        KafkaProducerHandler<Integer, byte[]> producer = new KafkaProducerHandler<Integer, byte[]>(producerProps);
 //
 //        // setup consumer
 //        Properties consumerProps = new Properties();

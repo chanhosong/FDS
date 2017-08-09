@@ -26,7 +26,7 @@ public class Bank {
         customer.setAccountID(bankID, registerAccountOnBankDB(customer.getCustomerID(), account));
 
         if(logger.isDebugEnabled()){
-            logger.debug(BankingConstants.LOG_APPENDER + "'{}' Bank : CustomerID '{}' is assigned AccountID: {}, Init Deposit : {}", bankID, customer.getCustomerID(), account.getAccountID(), account.getBalance());
+            logger.debug(BankingConstants.NEW_ACCOUNTID_LOG_APPENDER + "CustomerID '{}' is assigned AccountID '{}' Bank '{}', Init Deposit '{}'", customer.getCustomerID(), account.getAccountID(), bankID, account.getBalance());
         }
 
         return customer;

@@ -9,8 +9,10 @@ public class Bootstrap {
 	    System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
 	    System.setProperty("org.apache.commons.logging.simplelog.dateTimeFormat", "HH:mm:ss");
 		try {
-//			KafkaConsumer.run();
 			new EventGenerator().run();
+//			new TestMain().run();
+//            new KafkaPublisherApp().run();
+//			KafkaConsumer.init();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

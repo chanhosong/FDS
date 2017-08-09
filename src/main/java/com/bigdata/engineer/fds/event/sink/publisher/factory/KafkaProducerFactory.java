@@ -1,6 +1,6 @@
-package com.bigdata.engineer.fds.event.sink.publisher.factory;//package com.bigdata.engineer.fds.event.test.factory;
+//package com.bigdata.engineer.fds.event.sink.publisher.factory;//package com.bigdata.engineer.fds.event.test.factory;
 //
-//import com.bigdata.engineer.fds.event.test.internal.MessageSerializerType;
+//import com.bigdata.engineer.fds.event.sink.publisher.internal.MessageSerializerType;
 //import org.apache.kafka.clients.producer.Producer;
 //import org.apache.kafka.clients.producer.ProducerConfig;
 //

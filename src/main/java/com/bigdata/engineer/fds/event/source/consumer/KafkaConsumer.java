@@ -24,7 +24,7 @@ public class KafkaConsumer {
 
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.addSource("Source", "bank.events.test");
+        builder.addSource("Source", "bank.events");
 
         builder.addProcessor("Process", new MyProcessorSupplier(), "Source");
         builder.addStateStore(Stores.create("Counts").withStringKeys().withIntegerValues().inMemory().build(),
@@ -36,10 +36,9 @@ public class KafkaConsumer {
         final CountDownLatch latch = new CountDownLatch(1);
 
         // attach shutdown handler to catch control-c
-        Runtime.getRuntime().addShutdownHook(new Thread("fds.detections.test") {
+        Runtime.getRuntime().addShutdownHook(new Thread("fds.detections") {
             @Override
             public void run() {
-                System.out.println("test");
                 streams.close();
                 latch.countDown();
             }

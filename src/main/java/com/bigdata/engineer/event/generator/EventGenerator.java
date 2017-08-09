@@ -2,9 +2,10 @@ package com.bigdata.engineer.event.generator;
 
 import com.bigdata.engineer.banking.system.Bank;
 import com.bigdata.engineer.banking.system.config.BankingConstants;
-import com.bigdata.engineer.event.generator.eventunit.config.CustomerConstants;
+import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
 import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
 import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
+import com.bigdata.engineer.fds.event.sink.publisher.apps.KafkaPublisherApp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,11 +19,11 @@ public class EventGenerator {
     private String timeStamp = EventOperations.getTimestamp();
     private List<Bank> bankList = new ArrayList<>();
     private List<Customer> customerList = new ArrayList<>();
-    private static final int numberOfBank = 10;
-    private static final int numberOfCustomer = 10;
+    private static final int numberOfBank = 3;
+    private static final int numberOfCustomer = 3;
 
     public EventGenerator() {
-        logger.info(CustomerConstants.LOG_APPENDER + "EventGenerator is started!");
+        logger.info(EventConstants.LOG_APPENDER + "EventGenerator is started!");
     }
 
     public void run() {
@@ -43,30 +44,40 @@ public class EventGenerator {
                 customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.WITHDRAW, 1000
             ))));
         //5.transfer account: 랜덤고객에게 이체한다
-            customerList.forEach(customer ->
-                    customer.getAccountID().keySet().forEach(sourceBankID -> bankList.forEach(bank -> {
-                        String customerID = customer.getCustomerID();
-                        String sourceAccountID = customer.getAccountID(sourceBankID);
-                        Customer randomCustomer = customerList.get(EventOperations.getRandom(0,
-                                customerList.size() - 1));
-                        String targetCustomerID = randomCustomer.getCustomerID();
-                        String targetCustomerAccount = randomCustomer.getAccountID(sourceBankID);
+        customerList.forEach(customer ->
+                customer.getAccountID().keySet().forEach(sourceBankID -> bankList.forEach(bank -> {
+                    String customerID = customer.getCustomerID();
+                    String sourceAccountID = customer.getAccountID(sourceBankID);
+                    Customer randomCustomer = customerList.get(EventOperations.getRandom(0,
+                            customerList.size() - 1));
+                    String targetCustomerID = randomCustomer.getCustomerID();
+                    String targetCustomerAccount = randomCustomer.getAccountID(sourceBankID);
 
-                        try {
-                            bank.work(
-                                    customerID,
-                                    sourceBankID,
-                                    sourceAccountID,
+                    try {
+                        bank.work(
+                                customerID,
+                                sourceBankID,
+                                sourceAccountID,
+                                targetCustomerID,
+                                sourceBankID,//TODO change to targetBankID
+                                targetCustomerAccount,
+                                BankingConstants.TRANSFER,
+                                1000
+                        );
+                    } catch (Exception e) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(
+                                    "Wrong Transfer Error:: targetCustomerID: {}은 targetBankID: {}에 targetAccountID: {}이 없습니다",
                                     targetCustomerID,
-                                    sourceBankID,//TODO change to targetBankID
-                                    targetCustomerAccount,
-                                    BankingConstants.TRANSFER,
-                                    1000
-                            );
-                        } catch (Exception e) {
-                            logger.warn("Wrong Transfer Error:: targetCustomerID: {}은 targetBankID: {}에 targetAccountID: {}이 없습니다", targetCustomerID, sourceBankID, targetCustomerAccount);
+                                    sourceBankID,
+                                    targetCustomerAccount);
                         }
-                    })));
+                    }
+                })));
+
+        //6.running log parser
+        KafkaPublisherApp kafkaPublisherApp = new KafkaPublisherApp();
+        kafkaPublisherApp.run();
     }
 
     private void createBank(int number) {

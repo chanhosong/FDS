@@ -17,7 +17,7 @@ public class DepositTransaction extends TransactionsImpl {
     public int creditAmount(String customerID, String sourceBankID, String sourceAccountID) {
         int balance = super.creditAmount(customerID, sourceBankID, sourceAccountID);
         if (logger.isDebugEnabled()){
-            logger.debug(BankingConstants.TRANSACTION_LOG_APPENDER + "CustomerID '{}' has deposited '${} in '{}' bank '{}' (Before balance '${}' After balance : '${}')", customerID, amount, sourceBankID, sourceAccountID, balance+amount, balance);
+            logger.debug(BankingConstants.DEPOSIT_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has deposited '${}' in '{}' bank '{}' (Before balance '${}' After balance '${}')", customerID, amount, sourceBankID, sourceAccountID, balance+amount, balance);
         }
         return balance;
     }//입금잔고
