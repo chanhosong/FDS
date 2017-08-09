@@ -1,10 +1,7 @@
 package com.bigdata.engineer.event.generator.log.parser;
 
 import com.bigdata.engineer.banking.system.config.BankingConstants;
-import com.bigdata.engineer.event.generator.eventunit.banking.DepositEvent;
-import com.bigdata.engineer.event.generator.eventunit.banking.NewAccountEvent;
-import com.bigdata.engineer.event.generator.eventunit.banking.TransferEvent;
-import com.bigdata.engineer.event.generator.eventunit.banking.WithdrawEvent;
+import com.bigdata.engineer.event.generator.eventunit.banking.*;
 import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
 import org.apache.logging.log4j.LogManager;
 
@@ -102,34 +99,32 @@ public class LogParser implements Runnable{
                             case BankingConstants.NEW_ACCOUNTID_LOG_APPENDER :
                                 NewAccountEvent n = new NewAccountEvent();
                                 n.setCustomerID(customerID.group(3));n.setAccountID(customerID.group(7));
-                                for(LogListener logListener: listeners){
-                                    logListener.onDeliveryMessage(n);
-                                }
+                                this.sendListener(n);
                                 logger.debug(EventConstants.NEW_ACCOUNT_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}'", customerID.group(3), customerID.group(7)); break;
                             case BankingConstants.DEPOSIT_TRANSACTION_LOG_APPENDER :
                                 DepositEvent d = new DepositEvent();
                                 d.setCustomerID(customerID.group(3));d.setAccountID(customerID.group(11));d.setCreditAmount(customerID.group(7));
-                                for(LogListener logListener: listeners){
-                                    logListener.onDeliveryMessage(d);
-                                }
+                                this.sendListener(d);
                                 logger.debug(EventConstants.DEPOSIT_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}' CreditAmount {}", customerID.group(3), customerID.group(11), customerID.group(7)); break;
                             case BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER :
                                 WithdrawEvent w = new WithdrawEvent();
                                 w.setCustomerID(customerID.group(3));w.setAccountID(customerID.group(11));w.setDebitAmount(customerID.group(7));
-                                for(LogListener logListener: listeners){
-                                    logListener.onDeliveryMessage(w);
-                                }
+                                this.sendListener(w);
                                 logger.debug(EventConstants.WITHDRAW_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}' DebitAmount {}", customerID.group(3), customerID.group(11), customerID.group(7)); break;
                             case BankingConstants.TRANSFER_TRANSACTION_LOG_APPENDER :
                                 TransferEvent t = new TransferEvent();
                                 t.setCustomerID(customerID.group(3));t.setTransferAccount(customerID.group(13));t.setBeforeTransferAmount(customerID.group(17));t.setReceiveBankName(customerID.group(24));t.setReceiveCustomerID(customerID.group(21));t.setAmount(customerID.group(7));
-                                for(LogListener logListener: listeners){
-                                    logListener.onDeliveryMessage(t);
-                                }
+                                this.sendListener(t);
                                 logger.debug(EventConstants.TRANSFER_EVENT_LOG_APPENDER + "CustomerID '{}' TransferAccountID '{}' BeforeTransferAmount '{}' ReceiveBankName '{}' ReceiveCustomerID '{}' Amount '{}'", customerID.group(3), customerID.group(13), customerID.group(17), customerID.group(24), customerID.group(21), customerID.group(7)); break;
                         }
                     }
                 });
+    }
+
+    private void sendListener(LogEvent event) {
+        for(LogListener logListener: listeners){
+            logListener.onDeliveryMessage(event);
+        }
     }
 
     private void appendTraceLog(String line) {
