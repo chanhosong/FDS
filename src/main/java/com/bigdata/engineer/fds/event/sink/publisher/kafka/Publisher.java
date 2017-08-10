@@ -28,21 +28,19 @@ public class Publisher implements Runnable {
     }
 
     public void run() {
-        int messageNo = 1;
         while (true) {
-            String messageStr = "Message_" + messageNo;
+            String messageStr = "Message_";
             long startTime = System.currentTimeMillis();
             if (isAsync) { // Send asynchronously
-                producer.send(new ProducerRecord<>(topic, messageNo, messageStr), new PublisherCallBack(startTime, messageNo, messageStr));
+                producer.send(new ProducerRecord<>(topic, messageStr), new PublisherCallBack(startTime, messageStr));
             } else { // Send synchronously
                 try {
-                    producer.send(new ProducerRecord<>(topic, messageNo, messageStr)).get();
-                    System.out.println("Sent message: (" + messageNo + ", " + messageStr + ")");
+                    producer.send(new ProducerRecord<>(topic, messageStr)).get();
+                    System.out.println("Sent message: (" + ", " + messageStr + ")");
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
-            ++messageNo;
         }
     }
 }

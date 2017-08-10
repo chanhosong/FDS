@@ -48,7 +48,7 @@ public class KafkaPublisher implements KafkaProducerHandler {
         if (isSync)
             produceSync(value);
         else if (!isSync)
-            produceAsync(messageNo, value);
+            produceAsync(value);
         else throw new IllegalArgumentException("Expected sync or async, got " + isSync);
     }
 
@@ -66,9 +66,9 @@ public class KafkaPublisher implements KafkaProducerHandler {
     }
 
     /* Produce a record without waiting for server. This includes a callback that will print an error if something goes wrong */
-    private void produceAsync(int messageNo, String value) {
+    private void produceAsync(String value) {
         long startTime = System.currentTimeMillis();
-        producer.send(new ProducerRecord<>(topic, messageNo, value), new PublisherCallBack(startTime, messageNo, value));
+        producer.send(new ProducerRecord<>(topic, value), new PublisherCallBack(startTime, value));
     }
 
     /**

@@ -9,11 +9,9 @@ public class PublisherCallBack implements Callback {
     private static final Logger logger = LogManager.getLogger(PublisherCallBack.class);
 
     private final long startTime;
-    private final int key;
     private final String message;
-    public PublisherCallBack(long startTime, int key, String message) {
+    public PublisherCallBack(long startTime, String message) {
         this.startTime = startTime;
-        this.key = key;
         this.message = message;
     }
     /**
@@ -29,7 +27,7 @@ public class PublisherCallBack implements Callback {
         long elapsedTime = System.currentTimeMillis() - startTime;
         if (metadata != null) {
             logger.info(
-                    "message(" + key + ", " + message + ") sent to partition(" + metadata.partition() +
+                    "message(" + message + ") sent to partition(" + metadata.partition() +
                             "), " +
                             "offset(" + metadata.offset() + ") in " + elapsedTime + " ms");
         } else {
