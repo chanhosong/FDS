@@ -37,7 +37,7 @@
 //        Properties sessionProps = (Properties)configProps.clone();
 //        sessionProps.setProperty("group.id", groupId);
 //
-//        KafkaConsumer consumer = new KafkaConsumer(new ConsumerConfig(sessionProps), executorService, outputTransform, topics, session);
+//        FraudDetectionProcessor consumer = new FraudDetectionProcessor(new ConsumerConfig(sessionProps), executorService, outputTransform, topics, session);
 //        consumer.start();
 //        return consumer;
 //    }

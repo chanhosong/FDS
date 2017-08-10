@@ -1,7 +1,7 @@
 package com.bigdata.engineer.fds.event.source.consumer.config;
 
 public class KafkaConsumerConstants {
-    public static final String LOG_APPENDER = "KAFKA_CONSUMER_LOG:: ";
+    public static final String LOG_APPENDER = "FRAUD_DETECTOR_LOG:: ";
     public static final String KAFKA_PROPERTIES_FILE_NAME = "kafka.properties";
 
     /*	---------------------------------------------------------------------------------------

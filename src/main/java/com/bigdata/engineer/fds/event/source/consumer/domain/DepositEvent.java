@@ -1,18 +1,18 @@
-package com.bigdata.engineer.event.generator.eventunit.banking;
+package com.bigdata.engineer.fds.event.source.consumer.domain;
 
 /**
- * 출금 이벤트
+ * 입금 이벤트
  - 발생시각
  - 고객번호
  - 계좌번호
- - 출금 금액
+ - 입금 금액
  */
-public class WithdrawEvent extends LogEvent{
+public class DepositEvent extends LogEvent {
     private String type;
     private String timestamp;
-    private String customerID;
+    private String customerid;
     private String accountID;
-    private String debitAmount;
+    private String creditamount;
 
     public String getType() {
         return type;
@@ -30,12 +30,12 @@ public class WithdrawEvent extends LogEvent{
         this.timestamp = timestamp;
     }
 
-    public String getCustomerID() {
-        return customerID;
+    public String getCustomerid() {
+        return customerid;
     }
 
-    public void setCustomerID(String customerID) {
-        this.customerID = customerID;
+    public void setCustomerid(String customerid) {
+        this.customerid = customerid;
     }
 
     public String getAccountID() {
@@ -46,11 +46,11 @@ public class WithdrawEvent extends LogEvent{
         this.accountID = accountID;
     }
 
-    public String getDebitAmount() {
-        return debitAmount;
+    public String getCreditamount() {
+        return creditamount;
     }
 
-    public void setDebitAmount(String debitAmount) {
-        this.debitAmount = debitAmount;
+    public void setCreditamount(String creditAccount) {
+        this.creditamount = creditAccount;
     }
 }

@@ -8,10 +8,19 @@ package com.bigdata.engineer.event.generator.eventunit.banking;
  - 입금 금액
  */
 public class DepositEvent extends LogEvent{
+    private String type;
     private String timestamp;
     private String customerID;
     private String accountID;
     private String creditAmount;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getTimestamp() {
         return timestamp;

@@ -36,7 +36,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                com.bigdata.engineer.fds.event.source.consumer.KafkaConsumer.Bootstrap
+                                com.bigdata.engineer.fds.event.source.consumer.FraudDetectionProcessor.Bootstrap
                             </mainClass>
                         </manifest>
                     </archive>

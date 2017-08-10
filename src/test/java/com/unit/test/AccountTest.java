@@ -19,7 +19,7 @@
 //
 //    public void testItShouldCreateAccountWithInitialDeposit() throws Exception {
 //        bank.createAccount("123", 10);
-//        Account account = Account.getAccountID("123");
+//        Account account = Account.getAccountid("123");
 //        assertThat(account.getBalance(), is(10.0));
 //    }
 //

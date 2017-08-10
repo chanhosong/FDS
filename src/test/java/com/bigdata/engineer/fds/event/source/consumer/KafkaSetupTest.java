@@ -68,7 +68,7 @@
 //        consumerProps.setProperty("key.deserializer","org.apache.kafka.common.serialization.IntegerDeserializer");
 //        consumerProps.setProperty("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
 //        consumerProps.put("auto.offset.reset", "earliest");  // to make sure the consumer starts from the beginning of the topic
-//        KafkaConsumer<Integer, byte[]> consumer = new KafkaConsumer<>(consumerProps);
+//        FraudDetectionProcessor<Integer, byte[]> consumer = new FraudDetectionProcessor<>(consumerProps);
 //        consumer.subscribe(Arrays.asList(TOPIC));
 //
 //        // send message

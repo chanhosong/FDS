@@ -1,6 +1,7 @@
 package com.bigdata.engineer;
 
 import com.bigdata.engineer.event.generator.EventGenerator;
+import com.bigdata.engineer.fds.event.source.consumer.FraudDetectionProcessor;
 
 public class Bootstrap {
     public static void main(String[] args) {
@@ -9,10 +10,8 @@ public class Bootstrap {
 	    System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
 	    System.setProperty("org.apache.commons.logging.simplelog.dateTimeFormat", "HH:mm:ss");
 		try {
-			new EventGenerator().run();
-//			new TestMain().run();
-//            new KafkaPublisherApp().run();
-//			KafkaConsumer.init();
+			new EventGenerator().run();//1.create log and publishing event to topic 'bank.events'
+            new FraudDetectionProcessor().init();//2.consuming kafka stream event
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

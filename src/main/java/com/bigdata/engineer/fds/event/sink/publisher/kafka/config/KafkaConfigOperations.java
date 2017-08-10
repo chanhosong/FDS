@@ -56,7 +56,7 @@ public class KafkaConfigOperations {
             //load a properties file from class path, inside static method
             properties.load(propertiesInputStream);
 
-            //init Publisher Configuration
+            //start Publisher Configuration
             configuration.setApplicationId(properties.getProperty(KafkaPublisherConstants.PUBLISHER_APPLICATION_ID));
             configuration.setBootstrap(properties.getProperty(KafkaPublisherConstants.PUBLISHER_BOOTSTRAP));
             configuration.setTopic(properties.getProperty(KafkaPublisherConstants.PUBLISHER_TOPIC));

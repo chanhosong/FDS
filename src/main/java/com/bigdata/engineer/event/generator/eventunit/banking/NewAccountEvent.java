@@ -7,9 +7,18 @@ package com.bigdata.engineer.event.generator.eventunit.banking;
  - 계좌번호
  */
 public class NewAccountEvent extends LogEvent{
+    private String type;
     private String timestamp;
     private String customerID;
     private String accountID;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getTimestamp() {
         return timestamp;

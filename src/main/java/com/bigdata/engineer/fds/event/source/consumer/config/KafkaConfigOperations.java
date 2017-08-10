@@ -81,7 +81,7 @@ public class KafkaConfigOperations {
             //load a properties file from class path, inside static method
             properties.load(propertiesInputStream);
 
-            //init Cousumer Configuration
+            //start Cousumer Configuration
             configuration.setApplicationId(properties.getProperty(KafkaConsumerConstants.CONSUMER_APPLICATION_ID));
             configuration.setBootstrap(properties.getProperty(KafkaConsumerConstants.CONSUMER_BOOTSTRAP));
             configuration.setGroup(properties.getProperty(KafkaConsumerConstants.CONSUMER_GROUP));

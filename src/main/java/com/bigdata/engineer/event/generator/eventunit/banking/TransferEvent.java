@@ -11,6 +11,7 @@ package com.bigdata.engineer.event.generator.eventunit.banking;
  - 이체 금액
  */
 public class TransferEvent extends LogEvent{
+    private String type;
     private String timestamp;
     private String customerID;
     private String transferAccount;
@@ -18,6 +19,14 @@ public class TransferEvent extends LogEvent{
     private String receiveBankName;
     private String receiveCustomerID;
     private String amount;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getTimestamp() {
         return timestamp;

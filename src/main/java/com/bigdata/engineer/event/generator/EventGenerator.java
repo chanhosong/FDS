@@ -19,8 +19,8 @@ public class EventGenerator {
     private String timeStamp = EventOperations.getTimestamp();
     private List<Bank> bankList = new ArrayList<>();
     private List<Customer> customerList = new ArrayList<>();
-    private static final int numberOfBank = 3;
-    private static final int numberOfCustomer = 3;
+    private static final int numberOfBank = 2;
+    private static final int numberOfCustomer = 2;
 
     public EventGenerator() {
         logger.info(EventConstants.LOG_APPENDER + "EventGenerator is started!");
@@ -75,9 +75,9 @@ public class EventGenerator {
                     }
                 })));
 
-        //6.running log parser
+        //6.running log parser and puslishing event
         KafkaPublisherApp kafkaPublisherApp = new KafkaPublisherApp();
-        kafkaPublisherApp.run();
+        new Thread(kafkaPublisherApp).start();
     }
 
     private void createBank(int number) {

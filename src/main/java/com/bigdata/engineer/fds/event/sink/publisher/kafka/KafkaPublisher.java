@@ -49,7 +49,6 @@ public class KafkaPublisher implements KafkaProducerHandler {
         else if (!isSync)
             produceAsync(messageNo, value);
         else throw new IllegalArgumentException("Expected sync or async, got " + isSync);
-
     }
 
     @Override
