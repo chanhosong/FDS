@@ -30,6 +30,7 @@ public class KafkaPublisher implements KafkaProducerHandler {
         // This is mandatory, even though we don't send keys
         kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.IntegerSerializer");
         kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+//        kafkaProps.put("value.serializer", "com.bigdata.engineer.fds.event.source.consumer.domain.LogEvent");
         kafkaProps.put("acks", "1");
 
         // how many times to retry when produce request fails?

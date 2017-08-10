@@ -11,46 +11,56 @@ public class DepositEvent extends LogEvent {
     private String type;
     private String timestamp;
     private String customerid;
-    private String accountID;
+    private String accountid;
     private String creditamount;
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
 
+    @Override
     public String getTimestamp() {
         return timestamp;
     }
 
+    @Override
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
+    @Override
     public String getCustomerid() {
         return customerid;
     }
 
+    @Override
     public void setCustomerid(String customerid) {
         this.customerid = customerid;
     }
 
-    public String getAccountID() {
-        return accountID;
+    @Override
+    public String getAccountid() {
+        return accountid;
     }
 
-    public void setAccountID(String accountID) {
-        this.accountID = accountID;
+    @Override
+    public void setAccountid(String accountid) {
+        this.accountid = accountid;
     }
 
+    @Override
     public String getCreditamount() {
         return creditamount;
     }
 
-    public void setCreditamount(String creditAccount) {
-        this.creditamount = creditAccount;
+    @Override
+    public void setCreditamount(String creditamount) {
+        this.creditamount = creditamount;
     }
 }

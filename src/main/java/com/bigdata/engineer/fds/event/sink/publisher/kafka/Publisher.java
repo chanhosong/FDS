@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
-public class Publisher extends Thread {
+public class Publisher implements Runnable {
     private static final Logger logger = LogManager.getLogger(Publisher.class);
 
     private final KafkaProducer<Integer, String> producer;

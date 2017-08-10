@@ -14,7 +14,7 @@ import java.util.Map;
 public class Bank {
     private static final Logger logger = LogManager.getLogger(Bank.class);
 
-    private String bankID = EventOperations.getCustomerIDGenerator(6,4);
+    private String bankID = EventOperations.getCustomerIDGenerator(6,10);
     private Map<String, Map<String, Integer>> bankDB = BankDB.getInstance().getBankingData(bankID);//customerid, account
 
     public Bank () {

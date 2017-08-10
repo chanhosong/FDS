@@ -39,7 +39,7 @@ public class Customer {
     }
 
     private void createCustomerID() {
-        this.customerID = EventOperations.getCustomerIDGenerator(30,4);
+        this.customerID = EventOperations.getCustomerIDGenerator(30,10);
         if(logger.isDebugEnabled()){
             logger.debug(EventConstants.LOG_APPENDER + "New Customer ID : {}", this.customerID);
         }

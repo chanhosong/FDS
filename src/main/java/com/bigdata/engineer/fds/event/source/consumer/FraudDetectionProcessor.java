@@ -1,6 +1,7 @@
 package com.bigdata.engineer.fds.event.source.consumer;
 
 import com.bigdata.engineer.fds.event.source.consumer.config.KafkaConfigOperations;
+import com.bigdata.engineer.fds.event.source.consumer.internal.BankingEventSerde;
 import com.bigdata.engineer.fds.event.source.consumer.processor.MyProcessorSupplier;
 import org.apache.kafka.common.utils.Exit;
 import org.apache.kafka.streams.KafkaStreams;
@@ -18,16 +19,16 @@ public class FraudDetectionProcessor {
 
     public void init() throws Exception {
         logger.info("Start Fraud Detection System! Current date and time {}.", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        if(logger.isDebugEnabled()){
-            logger.debug("This is debug");
-        }
 
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.addSource("Source", "bank.events");
 
         builder.addProcessor("Process", new MyProcessorSupplier(), "Source");
-        builder.addStateStore(Stores.create("FraudStore").withStringKeys().withIntegerValues().inMemory().build(), "Process");
+        builder.addStateStore(Stores.create("FraudStore.NewAccountEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), "Process");
+        builder.addStateStore(Stores.create("FraudStore.DepositEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), "Process");
+        builder.addStateStore(Stores.create("FraudStore.WithdrawEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), "Process");
+        builder.addStateStore(Stores.create("FraudStore.TransferEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), "Process");
 
         builder.addSink("Sink", "fds.detections", "Process");
 

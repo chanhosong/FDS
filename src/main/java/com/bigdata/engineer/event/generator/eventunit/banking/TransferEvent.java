@@ -18,7 +18,7 @@ public class TransferEvent extends LogEvent{
     private String beforeTransferAmount;
     private String receiveBankName;
     private String receiveCustomerID;
-    private String amount;
+    private String transferamount;
 
     public String getType() {
         return type;
@@ -76,11 +76,11 @@ public class TransferEvent extends LogEvent{
         this.receiveCustomerID = receiveCustomerID;
     }
 
-    public String getAmount() {
-        return amount;
+    public String getTransferamount() {
+        return transferamount;
     }
 
-    public void setAmount(String amount) {
-        this.amount = amount;
+    public void setTransferamount(String transferamount) {
+        this.transferamount = transferamount;
     }
 }
