@@ -64,23 +64,36 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                                     //1. 이체후에 10000원 이하의 수상한 잔액계좌를 확인한다
                                     if (fraudAmount <= 10000) {
                                         if (logger.isDebugEnabled()) {
-                                            logger.debug(customervalues.getTimestamp() + " " + customervalues.getCustomerid() + " " + customervalues.getTransferaccount() + " " + customervalues.getBeforetransferamount() + " " + fraudAmount);
+                                            logger.warn("비정상 감지경고(잔액이 10000원 이하):: " + customervalues.getTimestamp() + " " + customervalues.getCustomerid() + " " + customervalues.getTransferaccount() + " " + customervalues.getBeforetransferamount() + " " + fraudAmount);
                                         }
 
                                         //2. 신규로 계좌를 만든지 7일이하인지 확인한다
                                         this.NewAccountEventStore.all().forEachRemaining(indexStore-> {
                                             if (!Objects.equals(indexStore.value, null) && !Objects.equals(indexStore.value.get(customervalues.getCustomerid()),null)) {
                                                 LogEvent customerValue = indexStore.value.get(customervalues.getCustomerid());
-                                                if(Instant.ofEpochMilli(Long.valueOf(customervalues.getTimestamp())).isAfter(days7Ago)) {
-                                                    System.out.println("이체한 날짜: " + formatter.format(Instant.ofEpochMilli(
-                                                            Long.valueOf(customervalues.getTimestamp())).atZone(ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
-                                                            Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
-                                                                    ZoneId.systemDefault())) + " " + customerValue.getCustomerid() + " " + customerValue.getAccountid() + ", 현재 잔액" + fraudAmount);
-                                                } else {
-                                                    System.out.println("7일이상이 있는지 테스트: "+ formatter.format(Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(ZoneId.systemDefault())));
+
+                                                if(Instant.ofEpochMilli(Long.valueOf(customervalues.getTimestamp())).isBefore(days7Ago)) {//계좌를 만든지 7일이 지남 - 정상
+                                                    if (logger.isDebugEnabled()) {
+                                                        logger.debug("이체한 날짜: " + formatter.format(Instant.ofEpochMilli(
+                                                                Long.valueOf(customervalues.getTimestamp())).atZone(
+                                                                ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
+                                                                Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
+                                                                        ZoneId.systemDefault())) + " " + customerValue.getCustomerid() + " " + customerValue.getAccountid() + ", 현재 잔액" + fraudAmount);
+                                                    }
+                                                } else {//계좌를 만든지 7일이 안지남 - 바정상
+                                                    if (logger.isWarnEnabled()) {
+                                                        logger.warn("비정상 감지경고(잔액이 10000원이하면서 7일이내의 신규계좌):: " + formatter.format(Instant.ofEpochMilli(
+                                                                Long.valueOf(customervalues.getTimestamp())).atZone(
+                                                                ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
+                                                                Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
+                                                                        ZoneId.systemDefault())) + " " + customerValue.getCustomerid() + " " + customerValue.getAccountid() + ", 현재 잔액" + fraudAmount);
+                                                    }
+
+                                                    
                                                 }
                                             }
                                         });
+
 
                                         /*next process??*/
 //                                        this.NewAccountEventStore.all().forEachRemaining(a->{
