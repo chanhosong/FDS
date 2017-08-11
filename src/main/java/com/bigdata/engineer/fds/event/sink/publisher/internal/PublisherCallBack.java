@@ -26,10 +26,12 @@ public class PublisherCallBack implements Callback {
     public void onCompletion(RecordMetadata metadata, Exception exception) {
         long elapsedTime = System.currentTimeMillis() - startTime;
         if (metadata != null) {
-            logger.info(
-                    "message(" + message + ") sent to partition(" + metadata.partition() +
-                            "), " +
-                            "offset(" + metadata.offset() + ") in " + elapsedTime + " ms");
+            if (logger.isTraceEnabled()) {
+                logger.trace(
+                        "message(" + message + ") sent to partition(" + metadata.partition() +
+                                "), " +
+                                "offset(" + metadata.offset() + ") in " + elapsedTime + " ms");
+            }
         } else {
             exception.printStackTrace();
         }

@@ -18,7 +18,6 @@ public class BankDB {
     private Map<String, Map<String, Map<String, Integer>>> allBankData = new HashMap<>();//store allBankData
     private Map<String, Map<String, Integer>> bankingData = new HashMap<>();//store customerID, accountID, balance
 
-
     private BankDB () {}
 
     public static BankDB getInstance() {
@@ -38,13 +37,13 @@ public class BankDB {
         return this.allBankData.get(bankID);
     }
 
-    public void runTransactions(String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID, TransactionsImpl transaction) {
+    public void runTransactions(String timestamp, String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID, TransactionsImpl transaction) {
         if(transaction instanceof WithdrawTransaction) {
-            transaction.debitAmount(customerID, sourceBankID, sourceAccountID);//출금잔고
+            transaction.debitAmount(timestamp, customerID, sourceBankID, sourceAccountID);//출금잔고
         } else if(transaction instanceof DepositTransaction) {
-            transaction.creditAmount(customerID, sourceBankID, sourceAccountID);//입금잔고
+            transaction.creditAmount(timestamp, customerID, sourceBankID, sourceAccountID);//입금잔고
         } else if(transaction instanceof TransferTransaction) {
-            transaction.transferAmount(customerID, sourceBankID, sourceAccountID, targetCustomerID, targetBankID, targetAccountID);//이체잔고
+            transaction.transferAmount(timestamp, customerID, sourceBankID, sourceAccountID, targetCustomerID, targetBankID, targetAccountID);//이체잔고
         }
     }
 }
