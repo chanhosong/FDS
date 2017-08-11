@@ -4,10 +4,12 @@ import com.bigdata.engineer.banking.system.config.BankingConstants;
 import com.bigdata.engineer.event.generator.eventunit.banking.*;
 import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
 import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
+import com.github.javafaker.Faker;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -94,6 +96,9 @@ public class LogParser implements Runnable{
         Stream.of(targetString)
                 .filter(Pattern.compile(logType).asPredicate())
                 .forEach(e->{
+                    Date now = new Date();
+                    Date then1 = new Date(now.getTime() + 100000);
+                    Date then2 = new Date(now.getTime() + 100000);
                     Matcher customerID = Pattern.compile(regex).matcher(e);
                     if (customerID.find()){
                         switch (logType) {
@@ -104,17 +109,17 @@ public class LogParser implements Runnable{
                                 logger.debug(EventConstants.NEW_ACCOUNT_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}'", customerID.group(3), customerID.group(7)); break;
                             case BankingConstants.DEPOSIT_TRANSACTION_LOG_APPENDER :
                                 DepositEvent d = new DepositEvent();
-                                d.setType(EventConstants.DEPOSIT_EVENT_LOG_APPENDER.trim());d.setTimestamp(EventOperations.getTimestamp());d.setCustomerID(customerID.group(3));d.setAccountID(customerID.group(11));d.setCreditAmount(customerID.group(7));
+                                d.setType(EventConstants.DEPOSIT_EVENT_LOG_APPENDER.trim());d.setTimestamp(String.valueOf(now.toInstant().toEpochMilli()));d.setCustomerID(customerID.group(3));d.setAccountID(customerID.group(11));d.setCreditAmount(customerID.group(7));
                                 this.sendEvent(d);
                                 logger.debug(EventConstants.DEPOSIT_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}' CreditAmount {}", customerID.group(3), customerID.group(11), customerID.group(7)); break;
                             case BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER :
                                 WithdrawEvent w = new WithdrawEvent();
-                                w.setType(EventConstants.WITHDRAW_EVENT_LOG_APPENDER.trim());w.setTimestamp(EventOperations.getTimestamp());w.setCustomerID(customerID.group(3));w.setAccountID(customerID.group(11));w.setDebitAmount(customerID.group(7));
+                                w.setType(EventConstants.WITHDRAW_EVENT_LOG_APPENDER.trim());w.setTimestamp(String.valueOf(new Faker().date().between(now, then1).toInstant().toEpochMilli()));w.setCustomerID(customerID.group(3));w.setAccountID(customerID.group(11));w.setDebitAmount(customerID.group(7));
                                 this.sendEvent(w);
                                 logger.debug(EventConstants.WITHDRAW_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}' DebitAmount {}", customerID.group(3), customerID.group(11), customerID.group(7)); break;
                             case BankingConstants.TRANSFER_TRANSACTION_LOG_APPENDER :
                                 TransferEvent t = new TransferEvent();
-                                t.setType(EventConstants.TRANSFER_EVENT_LOG_APPENDER.trim());t.setTimestamp(EventOperations.getTimestamp());t.setCustomerID(customerID.group(3));t.setTransferAccount(customerID.group(13));t.setBeforeTransferAmount(customerID.group(17));t.setReceiveBankName(customerID.group(24));t.setReceiveCustomerID(customerID.group(21));t.setTransferamount(customerID.group(7));
+                                t.setType(EventConstants.TRANSFER_EVENT_LOG_APPENDER.trim());t.setTimestamp(String.valueOf(new Faker().date().between(now, then2).toInstant().toEpochMilli()));t.setCustomerID(customerID.group(3));t.setTransferAccount(customerID.group(13));t.setBeforeTransferAmount(customerID.group(17));t.setReceiveBankName(customerID.group(24));t.setReceiveCustomerID(customerID.group(21));t.setTransferamount(customerID.group(7));
                                 this.sendEvent(t);
                                 logger.debug(EventConstants.TRANSFER_EVENT_LOG_APPENDER + "CustomerID '{}' TransferAccountID '{}' BeforeTransferAmount '{}' ReceiveBankName '{}' ReceiveCustomerID '{}' Amount '{}'", customerID.group(3), customerID.group(13), customerID.group(17), customerID.group(24), customerID.group(21), customerID.group(7)); break;
                         }

@@ -1,7 +1,7 @@
 package com.bigdata.engineer.event.generator.eventunit.customer;
 
 import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
-import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
+import com.github.javafaker.Faker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,7 +39,8 @@ public class Customer {
     }
 
     private void createCustomerID() {
-        this.customerID = EventOperations.getCustomerIDGenerator(30,10);
+//        this.customerID = EventOperations.randomIdentifier();//EventOperations.getCustomerIDGenerator(30,10);
+        this.customerID = new Faker().name().username();
         if(logger.isDebugEnabled()){
             logger.debug(EventConstants.LOG_APPENDER + "New Customer ID : {}", this.customerID);
         }

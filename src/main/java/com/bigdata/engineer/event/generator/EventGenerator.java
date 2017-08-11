@@ -6,6 +6,7 @@ import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
 import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
 import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
 import com.bigdata.engineer.fds.event.sink.publisher.apps.KafkaPublisherApp;
+import com.github.javafaker.Faker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,17 +32,17 @@ public class EventGenerator {
         this.createBank(numberOfBank);
         this.createCustomer(numberOfCustomer);
         //2.create account: 모든 고객이 각 은행에 대해서 계좌를 1개씩 계설한다
-        customerList.forEach(consumer-> bankList.forEach(bank->bank.createAccount(consumer, EventOperations.getRandom(0,10000))));
+        customerList.forEach(consumer-> bankList.forEach(bank->bank.createAccount(consumer, 0)));
         //3.deposit account: 모든 고객에 대해서 랜덤 보유계좌에 입금한다
         //Random Account : EventOperations.getRandom(0, e.getAccountNumber()-1)
         customerList.forEach(customer->
             customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->bank.work(
-                customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.DEPOSIT, 1000
+                customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.DEPOSIT, new Faker().number().numberBetween(0,9999999)
             ))));
         //4.withdraw account: 모든 고객에 대해서 랜덤 보유계좌에 출금한다
         customerList.forEach(customer->
             customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->bank.work(
-                customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.WITHDRAW, 1000
+                customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.WITHDRAW, new Faker().number().numberBetween(0,9999999)
             ))));
         //5.transfer account: 랜덤고객에게 이체한다
         customerList.forEach(customer ->
@@ -62,7 +63,7 @@ public class EventGenerator {
                                 sourceBankID,//TODO change to targetBankID
                                 targetCustomerAccount,
                                 BankingConstants.TRANSFER,
-                                1000
+                                new Faker().number().numberBetween(0,9999999)
                         );
                     } catch (Exception e) {
                         if (logger.isTraceEnabled()) {

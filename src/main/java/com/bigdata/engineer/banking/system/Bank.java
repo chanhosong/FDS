@@ -4,7 +4,7 @@ import com.bigdata.engineer.banking.system.config.BankingConstants;
 import com.bigdata.engineer.banking.system.database.BankDB;
 import com.bigdata.engineer.banking.system.transaction.TransactionsImpl;
 import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
-import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
+import com.github.javafaker.Faker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +14,7 @@ import java.util.Map;
 public class Bank {
     private static final Logger logger = LogManager.getLogger(Bank.class);
 
-    private String bankID = EventOperations.getCustomerIDGenerator(6,10);
+    private String bankID = new Faker().company().catchPhrase().replace(" ","");
     private Map<String, Map<String, Integer>> bankDB = BankDB.getInstance().getBankingData(bankID);//customerid, account
 
     public Bank () {
