@@ -36,7 +36,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                com.bigdata.engineer.fds.event.source.consumer.KafkaConsumer.Bootstrap
+                                com.bigdata.engineer.fds.event.source.consumer.FraudDetectionProcessor.Bootstrap
                             </mainClass>
                         </manifest>
                     </archive>
@@ -85,6 +85,17 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.25</version>
             <scope>compile</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>0.13</version>
         </dependency>
 
 

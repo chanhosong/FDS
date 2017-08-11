@@ -33,8 +33,8 @@ public class TransferTransaction extends TransactionsImpl {
         int creditAmount = super.creditAmount(customerID, targetBankID, targetAccountID);//2. 다음 입금을 한다
 
         if (logger.isDebugEnabled()){
-            logger.debug(BankingConstants.TRANSACTION_LOG_APPENDER +
-                    "CustomerID '{}' transferred '${}' from '{}' bank '{}' (Before balance '${}' After balance : '${}') to CustomerID '{}' of '{}' bank '{}' (Before balance '${}' After balance : '${}')"
+            logger.debug(BankingConstants.TRANSFER_TRANSACTION_LOG_APPENDER +
+                    "CustomerID '{}' transferred '${}' from '{}' bank '{}' (Before balance '${}' After balance '${}') to CustomerID '{}' of '{}' bank '{}' (Before balance '${}' After balance '${}')"
                     , customerID, amount, sourceBankID, sourceAccountID, debitAmount+amount, debitAmount, targetCustomerID, this.bankName, targetAccountID, creditAmount-amount, creditAmount);
         }
     }

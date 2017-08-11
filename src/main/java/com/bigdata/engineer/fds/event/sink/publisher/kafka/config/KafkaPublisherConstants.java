@@ -10,6 +10,7 @@ public class KafkaPublisherConstants {
     public static final String PUBLISHER_APPLICATION_ID = "kafka.publisher.applicationid";
     public static final String PUBLISHER_BOOTSTRAP = "kafka.publisher.bootstrap";
     public static final String PUBLISHER_TOPIC = "kafka.publisher.topic";
+    public static final int KAFKA_PRODUCER_BUFFER_SIZE = 64 * 1024;
 
     /*	---------------------------------------------------------------------------------------
                  Default values for the publisher specific configurations listed above

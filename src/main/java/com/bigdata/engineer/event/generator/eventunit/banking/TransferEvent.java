@@ -10,5 +10,77 @@ package com.bigdata.engineer.event.generator.eventunit.banking;
  - 수취 계좌주
  - 이체 금액
  */
-public class TransferEvent {
+public class TransferEvent extends LogEvent{
+    private String type;
+    private String timestamp;
+    private String customerID;
+    private String transferAccount;
+    private String beforeTransferAmount;
+    private String receiveBankName;
+    private String receiveCustomerID;
+    private String transferamount;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getCustomerID() {
+        return customerID;
+    }
+
+    public void setCustomerID(String customerID) {
+        this.customerID = customerID;
+    }
+
+    public String getTransferAccount() {
+        return transferAccount;
+    }
+
+    public void setTransferAccount(String transferAccount) {
+        this.transferAccount = transferAccount;
+    }
+
+    public String getBeforeTransferAmount() {
+        return beforeTransferAmount;
+    }
+
+    public void setBeforeTransferAmount(String beforeTransferAmount) {
+        this.beforeTransferAmount = beforeTransferAmount;
+    }
+
+    public String getReceiveBankName() {
+        return receiveBankName;
+    }
+
+    public void setReceiveBankName(String receiveBankName) {
+        this.receiveBankName = receiveBankName;
+    }
+
+    public String getReceiveCustomerID() {
+        return receiveCustomerID;
+    }
+
+    public void setReceiveCustomerID(String receiveCustomerID) {
+        this.receiveCustomerID = receiveCustomerID;
+    }
+
+    public String getTransferamount() {
+        return transferamount;
+    }
+
+    public void setTransferamount(String transferamount) {
+        this.transferamount = transferamount;
+    }
 }

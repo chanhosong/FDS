@@ -16,17 +16,6 @@ import java.util.Properties;
 public class KafkaConfigOperations {
     private static final Logger logger = LogManager.getLogger(KafkaConfigOperations.class);
 
-//    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
-//        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-//        factory.setConcurrency(1);
-//        factory.setConsumerFactory(consumerFactory());
-//        return factory;
-//    }
-//
-//    public ConsumerFactory<String, String> consumerFactory() {
-//        return new DefaultKafkaConsumerFactory<>(consumerProps(), stringKeyDeserializer(), payloadJsonValueDeserializer());
-//    }
-
     public static Properties consumerProps() {
         Properties props = new Properties();
 
@@ -35,20 +24,11 @@ public class KafkaConfigOperations {
         props.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+//        props.put(StreamsConfig.DEFAULT_TIMESTAMP_EXTRACTOR_CLASS_CONFIG, JsonTimestampExtractor.class);
         // setting offset reset to earliest so that we can re-run the demo code with the same pre-loaded data
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, readKafkaConfigs().getOffsetReset());
+
         return props;
-
-        //        Properties props = new Properties();
-
-//        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "streams-wordcount-processor");
-//        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-//        props.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
-//        props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-//        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-
-        // setting offset reset to earliest so that we can re-run the demo code with the same pre-loaded data
-//        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
     }
 
     private static KafkaConsumerConfiguration readKafkaConfigs() {
@@ -81,7 +61,7 @@ public class KafkaConfigOperations {
             //load a properties file from class path, inside static method
             properties.load(propertiesInputStream);
 
-            //init Cousumer Configuration
+            //start Cousumer Configuration
             configuration.setApplicationId(properties.getProperty(KafkaConsumerConstants.CONSUMER_APPLICATION_ID));
             configuration.setBootstrap(properties.getProperty(KafkaConsumerConstants.CONSUMER_BOOTSTRAP));
             configuration.setGroup(properties.getProperty(KafkaConsumerConstants.CONSUMER_GROUP));

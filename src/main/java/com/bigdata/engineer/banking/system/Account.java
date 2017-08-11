@@ -1,6 +1,6 @@
 package com.bigdata.engineer.banking.system;
 
-import com.bigdata.engineer.banking.system.utils.BankingOperations;
+import com.github.javafaker.Faker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,7 +15,7 @@ public class Account {
     }
 
     private void createAccount(int initialDeposit) {
-        this.accountID = BankingOperations.getAccountIDGenerator(30, 4);
+        this.accountID = new Faker().idNumber().valid();
         this.balance = initialDeposit;
     }
 
