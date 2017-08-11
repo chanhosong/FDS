@@ -15,10 +15,12 @@ public class KafkaConsumerConstants {
 
 
     /*	---------------------------------------------------------------------------------------
-                                  kafka publisher specific information
+                                  kafka stream specific information
         ---------------------------------------------------------------------------------------	*/
-
-
+    public static final String KAFKASOURCE = "kafkaSource";
+    public static final String STOREPROCESS = "storeProcess";
+    public static final String RULEPROCESS = "ruleProcess";
+    public static final String KAFKASINK = "kafkaSink";
 
 
     /*	---------------------------------------------------------------------------------------

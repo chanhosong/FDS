@@ -1,8 +1,10 @@
 package com.bigdata.engineer.fds.event.source.consumer;
 
 import com.bigdata.engineer.fds.event.source.consumer.config.KafkaConfigOperations;
+import com.bigdata.engineer.fds.event.source.consumer.config.KafkaConsumerConstants;
 import com.bigdata.engineer.fds.event.source.consumer.internal.BankingEventSerde;
-import com.bigdata.engineer.fds.event.source.consumer.processor.MyProcessorSupplier;
+import com.bigdata.engineer.fds.event.source.consumer.processor.RuleEngine;
+import com.bigdata.engineer.fds.event.source.consumer.processor.StoreProcessorSupplier;
 import org.apache.kafka.common.utils.Exit;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.processor.TopologyBuilder;
@@ -22,15 +24,17 @@ public class FraudDetectionProcessor {
 
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.addSource("Source", "bank.events");
+        builder.addSource(KafkaConsumerConstants.KAFKASOURCE, "bank.events");
 
-        builder.addProcessor("Process", new MyProcessorSupplier(), "Source");
-        builder.addStateStore(Stores.create("FraudStore.NewAccountEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), "Process");
-        builder.addStateStore(Stores.create("FraudStore.DepositEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), "Process");
-        builder.addStateStore(Stores.create("FraudStore.WithdrawEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), "Process");
-        builder.addStateStore(Stores.create("FraudStore.TransferEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), "Process");
+        builder.addProcessor(KafkaConsumerConstants.STOREPROCESS, new StoreProcessorSupplier(), KafkaConsumerConstants.KAFKASOURCE);
+        builder.addProcessor(KafkaConsumerConstants.RULEPROCESS, new RuleEngine(), KafkaConsumerConstants.KAFKASOURCE);
+        builder.addStateStore(Stores.create("FraudStore.NewAccountEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), KafkaConsumerConstants.STOREPROCESS, KafkaConsumerConstants.RULEPROCESS);
+        builder.addStateStore(Stores.create("FraudStore.DepositEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), KafkaConsumerConstants.STOREPROCESS, KafkaConsumerConstants.RULEPROCESS);
+        builder.addStateStore(Stores.create("FraudStore.WithdrawEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), KafkaConsumerConstants.STOREPROCESS, KafkaConsumerConstants.RULEPROCESS);
+        builder.addStateStore(Stores.create("FraudStore.TransferEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), KafkaConsumerConstants.STOREPROCESS, KafkaConsumerConstants.RULEPROCESS);
+        builder.addStateStore(Stores.create("FraudStore.FraudDetections").withIntegerKeys().withStringValues().inMemory().build(), KafkaConsumerConstants.RULEPROCESS);
 
-        builder.addSink("Sink", "fds.detections", "Process");
+        builder.addSink(KafkaConsumerConstants.KAFKASINK, "fds.detections", KafkaConsumerConstants.RULEPROCESS);
 
         final KafkaStreams streams = new KafkaStreams(builder, KafkaConfigOperations.consumerProps());
         final CountDownLatch latch = new CountDownLatch(1);
