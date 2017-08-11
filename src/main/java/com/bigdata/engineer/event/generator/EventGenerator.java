@@ -73,8 +73,8 @@ public class EventGenerator {
                                         100000000
                                 );
                             } catch (Exception e) {
-                                if (logger.isDebugEnabled()) {
-                                    logger.warn(
+                                if (logger.isTraceEnabled()) {
+                                    logger.trace(
                                             "Wrong Transfer Error:: targetCustomerID: {}은 targetBankID: {}에 targetAccountID: {}이 없습니다",
                                             targetCustomerID,
                                             targetBank.getBankID(),
