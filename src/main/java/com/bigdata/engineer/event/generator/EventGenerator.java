@@ -70,8 +70,8 @@ public class EventGenerator {
                                         targetBank.getBankID(),
                                         targetCustomerAccount,
                                         BankingConstants.TRANSFER,
-    //                                new Faker().number().numberBetween(0,9999999)
-                                        100000000
+                                    new Faker().number().numberBetween(0,2999999)
+//                                        1000000
                                 );
                             } catch (Exception e) {
                                 if (logger.isTraceEnabled()) {

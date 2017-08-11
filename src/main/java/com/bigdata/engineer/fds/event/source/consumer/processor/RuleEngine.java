@@ -78,18 +78,52 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                                                                 Long.valueOf(customervalues.getTimestamp())).atZone(
                                                                 ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
                                                                 Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
-                                                                        ZoneId.systemDefault())) + " " + customerValue.getCustomerid() + " " + customerValue.getAccountid() + ", 현재 잔액" + fraudAmount);
+                                                                        ZoneId.systemDefault())) + ", 고개이름: " + customerValue.getCustomerid() + ", 계좌번호: " + customerValue.getAccountid() + ", 현재 잔액: " + fraudAmount);
                                                     }
                                                 } else {//계좌를 만든지 7일이 안지남 - 바정상
                                                     if (logger.isWarnEnabled()) {
-                                                        logger.warn("비정상 감지경고(잔액이 10000원이하면서 7일이내의 신규계좌):: " + formatter.format(Instant.ofEpochMilli(
+                                                        logger.debug("비정상 감지경고(잔액이 10000원이하면서 7일이내의 신규계좌):: " + "이체한 날짜: " + formatter.format(Instant.ofEpochMilli(
                                                                 Long.valueOf(customervalues.getTimestamp())).atZone(
                                                                 ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
                                                                 Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
-                                                                        ZoneId.systemDefault())) + " " + customerValue.getCustomerid() + " " + customerValue.getAccountid() + ", 현재 잔액" + fraudAmount);
+                                                                        ZoneId.systemDefault())) + " " + customerValue.getCustomerid() + " " + customerValue.getAccountid() + ", 현재 잔액: " + fraudAmount);
                                                     }
+                                                    this.DepositEventStore.all().forEachRemaining(d->{
+                                                        if (!Objects.equals(d.value, null) && !Objects.equals(d.value.get(customerValue.getCustomerid()), null)) {
+                                                            LogEvent depositEvent = d.value.get(customerValue.getCustomerid());
+                                                            if ( 900000 <= Integer.valueOf(depositEvent.getCreditamount()) && Integer.valueOf(depositEvent.getCreditamount()) <= 1000000) {
+                                                                if (logger.isWarnEnabled()) {
+                                                                    logger.warn("비정상 감지경고(입금한 금액이 90-100만원이상):: " + ", 고객이름: " + depositEvent.getCustomerid() + ", 계좌번호: " + depositEvent.getAccountid() + ", 입금액: " + depositEvent.getCreditamount());
+                                                                }
+                                                                this.WithdrawEventStore.all().forEachRemaining(w->{
+                                                                    if (!Objects.equals(w.value, null) && !Objects.equals(w.value.get(customerValue.getCustomerid()), null)) {
+                                                                        LogEvent withdrawEvent = w.value.get(customerValue.getCustomerid());
 
-                                                    
+
+
+
+                                                                        if(Instant.ofEpochMilli(Long.valueOf(customervalues.getTimestamp())).isBefore(days7Ago)) {//계좌를 만든지 7일이 지남 - 정상
+                                                                            if (logger.isDebugEnabled()) {
+                                                                                logger.debug("이체한 날짜: " + formatter.format(Instant.ofEpochMilli(
+                                                                                        Long.valueOf(customervalues.getTimestamp())).atZone(
+                                                                                        ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
+                                                                                        Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
+                                                                                                ZoneId.systemDefault())) + ", 고개이름: " + customerValue.getCustomerid() + ", 계좌번호: " + customerValue.getAccountid() + ", 현재 잔액: " + fraudAmount);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    });
+
+                                                    //3. 90-100만원이 입금됐는지 확인한다
+
+//                                                    this.DepositEventStore.all().forEachRemaining(indexStore2-> {
+//                                                        if (!Objects.equals(indexStore2.value, null) && !Objects.equals(indexStore2.value.get(customervalues.getCustomerid()),null)) {
+//                                                            System.out.println(indexStore2.value.get(customervalues.getCustomerid()).getCustomerid()+ " "+indexStore2.value.get(customervalues.getCustomerid()).getAccountid()+ " "+indexStore2.value.get(customervalues.getCustomerid()).getCreditamount());
+//                                                        }
+//                                                    });
                                                 }
                                             }
                                         });
