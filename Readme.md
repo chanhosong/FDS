@@ -38,5 +38,6 @@ kafka consumer2 start
         --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
         
         
-###result
+result
+---
 ![ex_screenshot](./src/main/resources/img/resultScreenshot1.png)
