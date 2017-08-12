@@ -30,16 +30,13 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
     public Processor<String, Map<String , Map<String, LogEvent>>> get() {
         return new Processor<String, Map<String , Map<String, LogEvent>>>() {
             private ProcessorContext context;
-            private Map<String, Map<String, Integer>> bankDB;
             private KeyValueStore<String, Map<String, LogEvent>> NewAccountEventStore;//Index, CustomerID, Events
             private KeyValueStore<String, Map<String, LogEvent>> DepositEventStore;
             private KeyValueStore<String, Map<String, LogEvent>> WithdrawEventStore;
             private KeyValueStore<String, Map<String, LogEvent>> TransferEventStore;
             private DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
             private Instant days7Ago = ZonedDateTime.now().minusDays(7).toInstant();
-            private Instant hour2Ago = ZonedDateTime.now().minusHours(2).toInstant();
             private ObjectMapper mapper = new ObjectMapper();
-//            private KeyValueStore<String, String> FraudDetections;
             private int fraudDetectionsIndex = 0;
 
             @Override
@@ -54,7 +51,6 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                 this.DepositEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.DepositEvent");
                 this.WithdrawEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.WithdrawEvent");
                 this.TransferEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.TransferEvent");
-//                this.FraudDetections = (KeyValueStore<String, String>) context.getStateStore("FraudStore.FraudDetections");
             }
 
             @Override
@@ -63,7 +59,6 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                     if (Objects.equals(type, EventConstants.TRANSFER_EVENT_LOG_APPENDER.toLowerCase().trim())) {
                         eventMap.keySet().forEach(e->{//index로 순환
                             eventMap.values().forEach(customer-> {
-//                            bankDB = BankDB.getInstance().getBankingData(bankID);//customerid, account
                                 customer.values().forEach(transferEvent->{
                                     int fraudAmount = Integer.valueOf(transferEvent.getBeforetransferamount()) - Integer.valueOf(transferEvent.getTransferamount());
 
@@ -84,15 +79,7 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                                             if (!Objects.equals(indexStore.value, null) && !Objects.equals(indexStore.value.get(transferEvent.getCustomerid()),null)) {
                                                 LogEvent customerValue = indexStore.value.get(transferEvent.getCustomerid());
 
-                                                if(Instant.ofEpochMilli(Long.valueOf(transferEvent.getTimestamp())).isBefore(days7Ago)) {//계좌를 만든지 7일이 지남 - 정상
-                                                    if(transferEvent.getTransferaccount().contains(customerValue.getAccountid())) {
-                                                        if (logger.isDebugEnabled()) {
-                                                            logger.info("계좌를 만든날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(ZoneId.systemDefault()))
-                                                                    + ", 고객이름: " + customerValue.getCustomerid()
-                                                                    + ", 계좌번호: " + customerValue.getAccountid());
-                                                        }
-                                                    }
-                                                } else {//계좌를 만든지 7일이 안지남 - 바정상
+                                                if(!Instant.ofEpochMilli(Long.valueOf(transferEvent.getTimestamp())).isBefore(days7Ago)) {//계좌를 만든지 7일이 안지남 - 바정상
                                                     if(transferEvent.getTransferaccount().contains(customerValue.getAccountid())) {
                                                         if (logger.isWarnEnabled()) {
                                                             logger.info("Step2. 비정상 감지경고(잔액이 10000원이하면서 7일이내의 신규계좌):: "
@@ -148,8 +135,8 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                                                                                 } catch (JsonProcessingException e1) {
                                                                                     e1.printStackTrace();
                                                                                 }
-
-                                                                                logger.error("Step5. 최종 비정상 거래 판단 고객::  " + fraudDetectionEventJSON);
+//
+                                                                                logger.error("Step5. 최종 비정상 이체내역::  " + fraudDetectionEventJSON);
 
                                                                                 nextProcess(String.valueOf(fraudDetectionsIndex++), fraudDetectionEventJSON);
                                                                             }
@@ -159,21 +146,12 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                                                             }
                                                         });
                                                     }
-
-
-                                                    //3. 90-100만원이 입금됐는지 확인한다
-
-//                                                    this.DepositEventStore.all().forEachRemaining(indexStore2-> {
-//                                                        if (!Objects.equals(indexStore2.value, null) && !Objects.equals(indexStore2.value.get(customervalues.getCustomerid()),null)) {
-//                                                            System.out.println(indexStore2.value.get(customervalues.getCustomerid()).getCustomerid()+ " "+indexStore2.value.get(customervalues.getCustomerid()).getAccountid()+ " "+indexStore2.value.get(customervalues.getCustomerid()).getCreditamount());
-//                                                        }
-//                                                    });
                                                 }
                                             }
                                         });
 
 
-                                        /*next process??*/
+                                        /*next process*/
 //                                        this.NewAccountEventStore.all().forEachRemaining(a->{
 //                                            if (!Objects.equals(a.value, null)) {
 //                                                ((Map) a.value).values().forEach(f->{//Map<Integer, LogEvent>

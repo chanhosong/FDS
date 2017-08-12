@@ -113,7 +113,7 @@ public class LogParser implements Runnable{
                                 logger.debug(EventConstants.DEPOSIT_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}' CreditAmount {}", customerID.group(3), customerID.group(11), customerID.group(7)); break;
                             case BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER :
                                 WithdrawEvent w = new WithdrawEvent();
-                                w.setType(EventConstants.WITHDRAW_EVENT_LOG_APPENDER.trim());w.setTimestamp(String.valueOf(new Faker().date().past(2, TimeUnit.HOURS).toInstant().toEpochMilli()));w.setCustomerID(customerID.group(3));w.setAccountID(customerID.group(11));w.setDebitAmount(customerID.group(7));
+                                w.setType(EventConstants.WITHDRAW_EVENT_LOG_APPENDER.trim());w.setTimestamp(String.valueOf(new Faker().date().past(3, TimeUnit.HOURS).toInstant().toEpochMilli()));w.setCustomerID(customerID.group(3));w.setAccountID(customerID.group(11));w.setDebitAmount(customerID.group(7));
                                 this.sendEvent(w);
                                 logger.debug(EventConstants.WITHDRAW_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}' DebitAmount {}", customerID.group(3), customerID.group(11), customerID.group(7)); break;
                             case BankingConstants.TRANSFER_TRANSACTION_LOG_APPENDER :
