@@ -1,6 +1,12 @@
 Kafka Work.
 ===
 
+>work
+>1) Banking system -> generate log file.
+>2) parsing log file and generate event -> kafka publish to 'bank.events' topic
+>3) build kafka topology -> source, storeProcess, ruleProcess, sink
+     
+
 #command
 
 zookeeper start
