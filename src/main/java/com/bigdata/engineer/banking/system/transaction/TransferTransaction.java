@@ -38,27 +38,27 @@ public class TransferTransaction extends TransactionsImpl {
     public void transferAmount(String timestamp, String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID) {
         Map<String, Integer> account = bankDB.get(customerID);
         if(!Objects.equals(account.get(sourceAccountID), null) && !Objects.equals(account.get(targetAccountID), null)) {//본인은행의 다른 계좌 이체
-//            int debitAmount = super.debitAmount(timestamp, customerID, sourceBankID, sourceAccountID);//1. 먼저 출금을 한다
-//            int creditAmount = super.creditAmount(timestamp, targetCustomerID, targetBankID, targetAccountID);//2. 다음 입금을 한다
-//
-////            if (debitAmount - amount > 0) {
-//                if (logger.isDebugEnabled()) {
-//                    logger.debug(BankingConstants.TRANSFER_TRANSACTION_LOG_APPENDER +
-//                                    "CustomerID '{}' transferred '{}' from '{}' bank '{}' (Before balance '{}' After balance '{}') to CustomerID '{}' of '{}' bank '{}' (Before balance '{}' After balance '{}')"
-//                            ,
-//                            customerID,
-//                            amount,
-//                            sourceBankID,
-//                            sourceAccountID,
-//                            debitAmount + amount,
-//                            debitAmount,
-//                            targetCustomerID,
-//                            targetBankID,
-//                            targetAccountID,
-//                            creditAmount - amount,
-//                            creditAmount);
-////                }
-//            }
+            int debitAmount = super.debitAmount(timestamp, customerID, sourceBankID, sourceAccountID);//1. 먼저 출금을 한다
+            int creditAmount = super.creditAmount(timestamp, targetCustomerID, targetBankID, targetAccountID);//2. 다음 입금을 한다
+
+//            if (debitAmount - amount > 0) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(BankingConstants.TRANSFER_TRANSACTION_LOG_APPENDER +
+                                    "CustomerID '{}' transferred '{}' from '{}' bank '{}' (Before balance '{}' After balance '{}') to CustomerID '{}' of '{}' bank '{}' (Before balance '{}' After balance '{}')"
+                            ,
+                            customerID,
+                            amount,
+                            sourceBankID,
+                            sourceAccountID,
+                            debitAmount + amount,
+                            debitAmount,
+                            targetCustomerID,
+                            targetBankID,
+                            targetAccountID,
+                            creditAmount - amount,
+                            creditAmount);
+//                }
+            }
         }
         else {//타행이체
             int debitAmount = super.debitAmount(timestamp, customerID, targetBankID, sourceAccountID);//1. 먼저 출금을 한다
