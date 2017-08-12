@@ -108,12 +108,12 @@ public class LogParser implements Runnable{
                                 logger.debug(EventConstants.NEW_ACCOUNT_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}'", customerID.group(3), customerID.group(7)); break;
                             case BankingConstants.DEPOSIT_TRANSACTION_LOG_APPENDER :
                                 DepositEvent d = new DepositEvent();
-                                d.setType(EventConstants.DEPOSIT_EVENT_LOG_APPENDER.trim());d.setTimestamp(String.valueOf(new Faker().date().past(100, TimeUnit.SECONDS).toInstant().toEpochMilli()));d.setCustomerID(customerID.group(3));d.setAccountID(customerID.group(11));d.setCreditAmount(customerID.group(7));
+                                d.setType(EventConstants.DEPOSIT_EVENT_LOG_APPENDER.trim());d.setTimestamp(String.valueOf(new Faker().date().past(1, TimeUnit.DAYS).toInstant().toEpochMilli()));d.setCustomerID(customerID.group(3));d.setAccountID(customerID.group(11));d.setCreditAmount(customerID.group(7));
                                 this.sendEvent(d);
                                 logger.debug(EventConstants.DEPOSIT_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}' CreditAmount {}", customerID.group(3), customerID.group(11), customerID.group(7)); break;
                             case BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER :
                                 WithdrawEvent w = new WithdrawEvent();
-                                w.setType(EventConstants.WITHDRAW_EVENT_LOG_APPENDER.trim());w.setTimestamp(String.valueOf(new Faker().date().past(4, TimeUnit.HOURS).toInstant().toEpochMilli()));w.setCustomerID(customerID.group(3));w.setAccountID(customerID.group(11));w.setDebitAmount(customerID.group(7));
+                                w.setType(EventConstants.WITHDRAW_EVENT_LOG_APPENDER.trim());w.setTimestamp(String.valueOf(new Faker().date().past(2, TimeUnit.HOURS).toInstant().toEpochMilli()));w.setCustomerID(customerID.group(3));w.setAccountID(customerID.group(11));w.setDebitAmount(customerID.group(7));
                                 this.sendEvent(w);
                                 logger.debug(EventConstants.WITHDRAW_EVENT_LOG_APPENDER + "CustomerID '{}' AccountID '{}' DebitAmount {}", customerID.group(3), customerID.group(11), customerID.group(7)); break;
                             case BankingConstants.TRANSFER_TRANSACTION_LOG_APPENDER :

@@ -19,7 +19,7 @@ import java.util.concurrent.CountDownLatch;
 public class FraudDetectionProcessor {
     private static final Logger logger = LogManager.getLogger(FraudDetectionProcessor.class);
 
-    public void init() throws Exception {
+    public void run() throws Exception {
         logger.info("Start Fraud Detection System! Current date and time {}.", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
         TopologyBuilder builder = new TopologyBuilder();

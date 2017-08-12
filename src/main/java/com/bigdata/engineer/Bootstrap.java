@@ -11,7 +11,10 @@ public class Bootstrap {
 	    System.setProperty("org.apache.commons.logging.simplelog.dateTimeFormat", "HH:mm:ss");
 		try {
 			new EventGenerator().run();//1.create log and publishing event to topic 'bank.events'
-            new FraudDetectionProcessor().init();//2.consuming kafka stream event
+            new FraudDetectionProcessor().run();//2.consuming kafka stream event
+
+//			new Thread(new EventGenerator()).start();
+//            new Thread(new FraudDetectionProcessor()).start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

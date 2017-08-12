@@ -1,4 +1,4 @@
-package com.bigdata.engineer.fds.event.sink.publisher.internal;
+package com.bigdata.engineer.event.generator.publisher.internal;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.RecordMetadata;

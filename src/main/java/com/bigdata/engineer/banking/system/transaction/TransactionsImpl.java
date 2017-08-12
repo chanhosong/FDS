@@ -36,9 +36,18 @@ public class TransactionsImpl implements Transactions {
         int balance = account.get(sourceAccountID);
         int creditAmount = balance + amount;
 
-        if (logger.isDebugEnabled()){
-            logger.debug(BankingConstants.DEPOSIT_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has deposited '{}' in '{}' bank '{}' (Before balance '{}' After balance '{}')", customerID, amount, sourceBankID, sourceAccountID, balance, balance+amount);
-        }
+
+//        if (balance > 0 && creditAmount + amount > 0) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(BankingConstants.DEPOSIT_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has deposited '{}' in '{}' bank '{}' (Before balance '{}' After balance '{}')",
+                        customerID,
+                        amount,
+                        sourceBankID,
+                        sourceAccountID,
+                        balance,
+                        creditAmount);
+            }
+//        }
 
         account.put(sourceAccountID, creditAmount);
         return creditAmount;//입금잔고
@@ -48,14 +57,23 @@ public class TransactionsImpl implements Transactions {
     public int debitAmount(String timestamp, String customerID, String sourceBankID, String sourceAccountID) {
         Map<String, Integer> account = bankDB.get(customerID);
         int balance = account.get(sourceAccountID);
-        int creditAmount = balance - amount;
+        int debitAmount = balance - amount;
 
-        if (logger.isDebugEnabled()){
-            logger.debug(BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has withdrew '{}' in '{}' bank '{}' (Before balance '{}' After balance '{}')", customerID, amount, sourceBankID, sourceAccountID, balance-amount, balance);
-        }
 
-        account.put(sourceAccountID, creditAmount);
-        return creditAmount;//출금잔고
+//        if (debitAmount - amount > 0) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has withdrew '{}' in '{}' bank '{}' (Before balance '{}' After balance '{}')",
+                        customerID,
+                        amount,
+                        sourceBankID,
+                        sourceAccountID,
+                        balance,
+                        debitAmount);
+            }
+//        }
+
+        account.put(sourceAccountID, debitAmount);
+        return debitAmount;//출금잔고
     }
 
     @Override

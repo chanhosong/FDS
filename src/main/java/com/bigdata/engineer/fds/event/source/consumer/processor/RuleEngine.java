@@ -1,8 +1,11 @@
 package com.bigdata.engineer.fds.event.source.consumer.processor;
 
 import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
+import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
 import com.bigdata.engineer.fds.event.source.consumer.config.KafkaConsumerConstants;
+import com.bigdata.engineer.fds.event.source.consumer.domain.FraudDetectionEvent;
 import com.bigdata.engineer.fds.event.source.consumer.domain.LogEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.streams.processor.Processor;
 import org.apache.kafka.streams.processor.ProcessorContext;
@@ -16,6 +19,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,12 +30,14 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
     public Processor<String, Map<String , Map<String, LogEvent>>> get() {
         return new Processor<String, Map<String , Map<String, LogEvent>>>() {
             private ProcessorContext context;
+            private Map<String, Map<String, Integer>> bankDB;
             private KeyValueStore<String, Map<String, LogEvent>> NewAccountEventStore;//Index, CustomerID, Events
             private KeyValueStore<String, Map<String, LogEvent>> DepositEventStore;
             private KeyValueStore<String, Map<String, LogEvent>> WithdrawEventStore;
             private KeyValueStore<String, Map<String, LogEvent>> TransferEventStore;
             private DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
             private Instant days7Ago = ZonedDateTime.now().minusDays(7).toInstant();
+            private Instant hour2Ago = ZonedDateTime.now().minusHours(2).toInstant();
             private ObjectMapper mapper = new ObjectMapper();
 //            private KeyValueStore<String, String> FraudDetections;
             private int fraudDetectionsIndex = 0;
@@ -52,70 +58,97 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
             }
 
             @Override
-            public void process(String type, Map<String , Map<String, LogEvent>> eventMap) {
+            public void process(String type, Map<String , Map<String, LogEvent>> eventMap) {//index, customer, eventLogs
                 try {
-//                    System.out.println(eventMap.keySet() + " " + eventMap.values());
                     if (Objects.equals(type, EventConstants.TRANSFER_EVENT_LOG_APPENDER.toLowerCase().trim())) {
                         eventMap.keySet().forEach(e->{//index로 순환
                             eventMap.values().forEach(customer-> {
-                                customer.values().forEach(customervalues->{
-                                    int fraudAmount = Integer.valueOf(customervalues.getBeforetransferamount()) - Integer.valueOf(customervalues.getTransferamount());
+//                            bankDB = BankDB.getInstance().getBankingData(bankID);//customerid, account
+                                customer.values().forEach(transferEvent->{
+                                    int fraudAmount = Integer.valueOf(transferEvent.getBeforetransferamount()) - Integer.valueOf(transferEvent.getTransferamount());
 
                                     //1. 이체후에 10000원 이하의 수상한 잔액계좌를 확인한다
-                                    if (fraudAmount <= 10000) {
+                                    if (!transferEvent.getCustomerid().matches(transferEvent.getReceivecustomerid()) && fraudAmount <= 10000) {
                                         if (logger.isDebugEnabled()) {
-                                            logger.warn("비정상 감지경고(잔액이 10000원 이하):: " + customervalues.getTimestamp() + " " + customervalues.getCustomerid() + " " + customervalues.getTransferaccount() + " " + customervalues.getBeforetransferamount() + " " + fraudAmount);
+                                            logger.info("Step1. 비정상 감지경고(잔액이 10000원 이하):: " + "이체한날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(transferEvent.getTimestamp())).atZone(ZoneId.systemDefault())) + ", 고객이름: " + transferEvent.getCustomerid() + ", 이체 계좌: " + transferEvent.getTransferaccount() + ", 이체 했었던 금액: "+ transferEvent.getTransferamount() + ", 이체 직전 잔액: " + transferEvent.getBeforetransferamount() + ", 이체후 잔액: " + fraudAmount);
                                         }
 
                                         //2. 신규로 계좌를 만든지 7일이하인지 확인한다
                                         this.NewAccountEventStore.all().forEachRemaining(indexStore-> {
-                                            if (!Objects.equals(indexStore.value, null) && !Objects.equals(indexStore.value.get(customervalues.getCustomerid()),null)) {
-                                                LogEvent customerValue = indexStore.value.get(customervalues.getCustomerid());
+                                            if (!Objects.equals(indexStore.value, null) && !Objects.equals(indexStore.value.get(transferEvent.getCustomerid()),null)) {
+                                                LogEvent customerValue = indexStore.value.get(transferEvent.getCustomerid());
 
-                                                if(Instant.ofEpochMilli(Long.valueOf(customervalues.getTimestamp())).isBefore(days7Ago)) {//계좌를 만든지 7일이 지남 - 정상
-                                                    if (logger.isDebugEnabled()) {
-                                                        logger.debug("이체한 날짜: " + formatter.format(Instant.ofEpochMilli(
-                                                                Long.valueOf(customervalues.getTimestamp())).atZone(
-                                                                ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
-                                                                Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
-                                                                        ZoneId.systemDefault())) + ", 고개이름: " + customerValue.getCustomerid() + ", 계좌번호: " + customerValue.getAccountid() + ", 현재 잔액: " + fraudAmount);
+                                                if(Instant.ofEpochMilli(Long.valueOf(transferEvent.getTimestamp())).isBefore(days7Ago)) {//계좌를 만든지 7일이 지남 - 정상
+                                                    if(transferEvent.getTransferaccount().contains(customerValue.getAccountid())) {
+                                                        if (logger.isDebugEnabled()) {
+                                                            logger.info("계좌를 만든날짜: " + formatter.format(
+                                                                    Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
+                                                                            ZoneId.systemDefault())) + ", 고객이름: " + customerValue.getCustomerid() + ", 계좌번호: " + customerValue.getAccountid());
+                                                        }
                                                     }
                                                 } else {//계좌를 만든지 7일이 안지남 - 바정상
-                                                    if (logger.isWarnEnabled()) {
-                                                        logger.debug("비정상 감지경고(잔액이 10000원이하면서 7일이내의 신규계좌):: " + "이체한 날짜: " + formatter.format(Instant.ofEpochMilli(
-                                                                Long.valueOf(customervalues.getTimestamp())).atZone(
-                                                                ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
-                                                                Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
-                                                                        ZoneId.systemDefault())) + " " + customerValue.getCustomerid() + " " + customerValue.getAccountid() + ", 현재 잔액: " + fraudAmount);
-                                                    }
-                                                    this.DepositEventStore.all().forEachRemaining(d->{
-                                                        if (!Objects.equals(d.value, null) && !Objects.equals(d.value.get(customerValue.getCustomerid()), null)) {
-                                                            LogEvent depositEvent = d.value.get(customerValue.getCustomerid());
-                                                            if ( 900000 <= Integer.valueOf(depositEvent.getCreditamount()) && Integer.valueOf(depositEvent.getCreditamount()) <= 1000000) {
-                                                                if (logger.isWarnEnabled()) {
-                                                                    logger.warn("비정상 감지경고(입금한 금액이 90-100만원이상):: " + ", 고객이름: " + depositEvent.getCustomerid() + ", 계좌번호: " + depositEvent.getAccountid() + ", 입금액: " + depositEvent.getCreditamount());
-                                                                }
-                                                                this.WithdrawEventStore.all().forEachRemaining(w->{
-                                                                    if (!Objects.equals(w.value, null) && !Objects.equals(w.value.get(customerValue.getCustomerid()), null)) {
-                                                                        LogEvent withdrawEvent = w.value.get(customerValue.getCustomerid());
+                                                    if(transferEvent.getTransferaccount().contains(customerValue.getAccountid())) {
+                                                        if (logger.isWarnEnabled()) {
+                                                            logger.info("Step2. 비정상 감지경고(잔액이 10000원이하면서 7일이내의 신규계좌):: " + "이체한 날짜: " + formatter.format(
+                                                                    Instant.ofEpochMilli(
+                                                                            Long.valueOf(transferEvent.getTimestamp())).atZone(
+                                                                            ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
+                                                                    Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
+                                                                            ZoneId.systemDefault())) + " " + customerValue.getCustomerid() + " " + customerValue.getAccountid());
+                                                        }
+                                                        this.DepositEventStore.all().forEachRemaining(d->{
+                                                            if (!Objects.equals(d.value, null) && !Objects.equals(d.value.get(customerValue.getCustomerid()), null)) {
+                                                                LogEvent depositEvent = d.value.get(customerValue.getCustomerid());
+                                                                if ( 900000 <= Integer.valueOf(depositEvent.getCreditamount()) && Integer.valueOf(depositEvent.getCreditamount()) <= 1000000) {
+                                                                    if (logger.isWarnEnabled()) {
+                                                                        logger.warn("Step3. 비정상 감지경고 입금내역(7일이내 입금한 금액이 90-100만원이상):: "+ "이체한 날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(transferEvent.getTimestamp())).atZone(ZoneId.systemDefault())) + "입금날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(depositEvent.getTimestamp())).atZone(ZoneId.systemDefault()))  + ", 고객이름: " + depositEvent.getCustomerid() + ", 계좌번호: " + depositEvent.getAccountid() + ", 입금액: " + depositEvent.getCreditamount());
+                                                                    }
+                                                                    this.WithdrawEventStore.all().forEachRemaining(w->{
+                                                                        if (!Objects.equals(w.value, null) && !Objects.equals(w.value.get(customerValue.getCustomerid()), null)) {
+                                                                            LogEvent withdrawEvent = w.value.get(customerValue.getCustomerid());
+                                                                            Instant depositTimestamp = Instant.ofEpochMilli(Long.valueOf(depositEvent.getTimestamp()));
+                                                                            Instant withdrawTimestamp = Instant.ofEpochMilli(Long.valueOf(withdrawEvent.getTimestamp()));
 
+                                                                            if(ChronoUnit.SECONDS.between(depositTimestamp, withdrawTimestamp) <= 7200) {//2시간 이내에 출금된 기록을 확인함
+                                                                                if (logger.isDebugEnabled()) {
+                                                                                    logger.warn("Step4. 비정상 감지경고(출금시간이 2시간이내):: " + "출금한 날짜: " + formatter.format(Instant.ofEpochMilli(
+                                                                                            Long.valueOf(withdrawEvent.getTimestamp())).atZone(
+                                                                                            ZoneId.systemDefault())) + ", 입금한날짜: " + formatter.format(
+                                                                                            Instant.ofEpochMilli(Long.valueOf(depositEvent.getTimestamp())).atZone(
+                                                                                                    ZoneId.systemDefault())) + ", 고객이름: " + withdrawEvent.getCustomerid() + ", 계좌번호: " + withdrawEvent.getAccountid() + ", 출금액: " + withdrawEvent.getDebitamount());
+                                                                                }
 
+                                                                                FraudDetectionEvent fraudDetectionEvent = new FraudDetectionEvent();
+                                                                                fraudDetectionEvent.setType(EventConstants.FRAUD_DETECTION_EVENT_LOG_APPENDER);
+                                                                                fraudDetectionEvent.setTimestamp(EventOperations.getTimestamp());
+                                                                                fraudDetectionEvent.setCustomerid(withdrawEvent.getCustomerid());
+                                                                                fraudDetectionEvent.setAccountid(customerValue.getAccountid());
+                                                                                fraudDetectionEvent.setTransferaccount(transferEvent.getTransferaccount());
+                                                                                fraudDetectionEvent.setBeforetransferamount(transferEvent.getBeforetransferamount());
+                                                                                fraudDetectionEvent.setReceivebankname(transferEvent.getReceivebankname());
+                                                                                fraudDetectionEvent.setReceivecustomerid(transferEvent.getReceivecustomerid());
+                                                                                fraudDetectionEvent.setCreditamount(depositEvent.getCreditamount());
+                                                                                fraudDetectionEvent.setDebitamount(withdrawEvent.getDebitamount());
+                                                                                fraudDetectionEvent.setTransferamount(transferEvent.getTransferamount());
 
+                                                                                String fraudDetectionEventJSON = null;
+                                                                                try {
+                                                                                    fraudDetectionEventJSON = mapper.writeValueAsString(fraudDetectionEvent);
+                                                                                } catch (JsonProcessingException e1) {
+                                                                                    e1.printStackTrace();
+                                                                                }
 
-                                                                        if(Instant.ofEpochMilli(Long.valueOf(customervalues.getTimestamp())).isBefore(days7Ago)) {//계좌를 만든지 7일이 지남 - 정상
-                                                                            if (logger.isDebugEnabled()) {
-                                                                                logger.debug("이체한 날짜: " + formatter.format(Instant.ofEpochMilli(
-                                                                                        Long.valueOf(customervalues.getTimestamp())).atZone(
-                                                                                        ZoneId.systemDefault())) + ", 계좌를 만든날짜: " + formatter.format(
-                                                                                        Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(
-                                                                                                ZoneId.systemDefault())) + ", 고개이름: " + customerValue.getCustomerid() + ", 계좌번호: " + customerValue.getAccountid() + ", 현재 잔액: " + fraudAmount);
+                                                                                logger.error("Step5. 최종 비정상 거래 판단 고객::  " + fraudDetectionEventJSON);
+
+                                                                                nextProcess(String.valueOf(fraudDetectionsIndex++), fraudDetectionEventJSON);
                                                                             }
                                                                         }
-                                                                    }
-                                                                });
+                                                                    });
+                                                                }
                                                             }
-                                                        }
-                                                    });
+                                                        });
+                                                    }
+
 
                                                     //3. 90-100만원이 입금됐는지 확인한다
 
@@ -177,8 +210,8 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                 });
             }
 
-            private void nextProcess(String type, String json) {
-                context.forward(type, json);
+            private void nextProcess(String index, String json) {
+                context.forward(index, json);
                 context.commit();
             }
 

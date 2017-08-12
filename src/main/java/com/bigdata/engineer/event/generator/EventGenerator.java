@@ -2,16 +2,17 @@ package com.bigdata.engineer.event.generator;
 
 import com.bigdata.engineer.banking.system.Bank;
 import com.bigdata.engineer.banking.system.config.BankingConstants;
+import com.bigdata.engineer.banking.system.database.BankDB;
 import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
 import com.bigdata.engineer.event.generator.eventunit.customer.Customer;
-import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
-import com.bigdata.engineer.fds.event.sink.publisher.apps.KafkaPublisherApp;
+import com.bigdata.engineer.event.generator.publisher.apps.KafkaPublisherApp;
 import com.github.javafaker.Faker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import static com.bigdata.engineer.banking.system.utils.BankingOperations.getTimestamp;
@@ -19,7 +20,7 @@ import static com.bigdata.engineer.banking.system.utils.BankingOperations.getTim
 public class EventGenerator {
     private static final Logger logger = LogManager.getLogger(EventGenerator.class);
 
-    private String timeStamp = EventOperations.getTimestamp();
+    private Map<String, Map<String, Integer>> bankDB;
     private List<Bank> bankList = new ArrayList<>();
     private List<Customer> customerList = new ArrayList<>();
     private static final int numberOfBank = 2;
@@ -38,19 +39,26 @@ public class EventGenerator {
         //3.deposit account: 모든 고객에 대해서 랜덤 보유계좌에 입금한다
         //Random Account : EventOperations.getRandom(0, e.getAccountNumber()-1)
         customerList.forEach(customer->
-            customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->bank.work(
-                getTimestamp(), customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.DEPOSIT, new Faker().number().numberBetween(0,9999999)
-            ))));
+            customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->
+                bank.work(
+                        getTimestamp(), customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.DEPOSIT, new Faker().number().numberBetween(0,9999999)
+                )
+            )));
         //4.withdraw account: 모든 고객에 대해서 랜덤 보유계좌에 출금한다
         customerList.forEach(customer->
-            customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->bank.work(
-                getTimestamp(), customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.WITHDRAW, new Faker().number().numberBetween(0,9999999)
-            ))));
+            customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->{
+                bankDB = BankDB.getInstance().getBankingData(bank.getBankID());
+                int balance = bankDB.get(customer.getCustomerID()).get(customer.getAccountID(sourceBankID));
+                bank.work(
+                        getTimestamp(), customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.WITHDRAW, new Faker().number().numberBetween(0,balance)
+                );
+            })));
         //5.transfer account: 랜덤고객에게 이체한다
         bankList.forEach(targetBank->{
             customerList.forEach(targetCustomer ->{
                 customerList.forEach(customer ->
                         customer.getAccountID().keySet().forEach(sourceBankID -> bankList.forEach(bank -> {
+//                            bankDB = BankDB.getInstance().getBankingData(sourceBankID);
                             String customerID = customer.getCustomerID();
                             String sourceAccountID = customer.getAccountID(sourceBankID);
                             /*최종 test시에 랜덤 고객을 쓸것*/
@@ -59,6 +67,7 @@ public class EventGenerator {
                             Customer randomCustomer = targetCustomer;
                             String targetCustomerID = randomCustomer.getCustomerID();
                             String targetCustomerAccount = randomCustomer.getAccountID(targetBank.getBankID());
+//                            int balance = bankDB.get(customerID).get(sourceAccountID);
 
                             try {
                                 bank.work(
@@ -70,8 +79,9 @@ public class EventGenerator {
                                         targetBank.getBankID(),
                                         targetCustomerAccount,
                                         BankingConstants.TRANSFER,
-                                    new Faker().number().numberBetween(0,2999999)
-//                                        1000000
+//                                        new Faker().number().numberBetween(0,9999999)
+                                        new Faker().number().numberBetween(800000,110000)
+//                                        900000
                                 );
                             } catch (Exception e) {
                                 if (logger.isTraceEnabled()) {

@@ -1,6 +1,6 @@
-package com.bigdata.engineer.fds.event.sink.publisher.kafka;
+package com.bigdata.engineer.event.generator.publisher.kafka;
 
-import com.bigdata.engineer.fds.event.sink.publisher.internal.PublisherCallBack;
+import com.bigdata.engineer.event.generator.publisher.internal.PublisherCallBack;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.logging.log4j.LogManager;

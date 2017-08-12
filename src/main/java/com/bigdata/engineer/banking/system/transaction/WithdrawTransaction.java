@@ -17,9 +17,17 @@ public class WithdrawTransaction extends TransactionsImpl {
     public int debitAmount(String timestamp, String customerID, String sourceBankID, String sourceAccountID) {
         int balance = super.debitAmount(timestamp, customerID, sourceBankID, sourceAccountID);
 
-        if (logger.isDebugEnabled()){
-            logger.debug(BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has withdrew '{}' in '{}' bank '{}' (Before balance '{}' After balance '{}')", customerID, amount, sourceBankID, sourceAccountID, balance, balance-amount);
-        }
+//        if (balance - amount > 0) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has withdrew '{}' in '{}' bank '{}' (Before balance '{}' After balance '{}')",
+                        customerID,
+                        amount,
+                        sourceBankID,
+                        sourceAccountID,
+                        balance,
+                        balance - amount);
+            }
+//        }
 
         return balance;
     }//출금잔고
