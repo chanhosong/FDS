@@ -19,7 +19,7 @@ import java.util.concurrent.CountDownLatch;
 public class FraudDetectionProcessor {
     private static final Logger logger = LogManager.getLogger(FraudDetectionProcessor.class);
 
-    public void init() throws Exception {
+    public void run() throws Exception {
         logger.info("Start Fraud Detection System! Current date and time {}.", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
         TopologyBuilder builder = new TopologyBuilder();
@@ -27,12 +27,13 @@ public class FraudDetectionProcessor {
         builder.addSource(KafkaConsumerConstants.KAFKASOURCE, "bank.events");
 
         builder.addProcessor(KafkaConsumerConstants.STOREPROCESS, new StoreProcessorSupplier(), KafkaConsumerConstants.KAFKASOURCE);
-        builder.addProcessor(KafkaConsumerConstants.RULEPROCESS, new RuleEngine(), KafkaConsumerConstants.KAFKASOURCE);
+        builder.addProcessor(KafkaConsumerConstants.RULEPROCESS, new RuleEngine(), KafkaConsumerConstants.STOREPROCESS);
+
         builder.addStateStore(Stores.create("FraudStore.NewAccountEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), KafkaConsumerConstants.STOREPROCESS, KafkaConsumerConstants.RULEPROCESS);
         builder.addStateStore(Stores.create("FraudStore.DepositEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), KafkaConsumerConstants.STOREPROCESS, KafkaConsumerConstants.RULEPROCESS);
         builder.addStateStore(Stores.create("FraudStore.WithdrawEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), KafkaConsumerConstants.STOREPROCESS, KafkaConsumerConstants.RULEPROCESS);
         builder.addStateStore(Stores.create("FraudStore.TransferEvent").withStringKeys().withValues(new BankingEventSerde().logEventSerde()).inMemory().build(), KafkaConsumerConstants.STOREPROCESS, KafkaConsumerConstants.RULEPROCESS);
-        builder.addStateStore(Stores.create("FraudStore.FraudDetections").withIntegerKeys().withStringValues().inMemory().build(), KafkaConsumerConstants.RULEPROCESS);
+        builder.addStateStore(Stores.create("FraudStore.FraudDetections").withStringKeys().withStringValues().inMemory().build(), KafkaConsumerConstants.RULEPROCESS);
 
         builder.addSink(KafkaConsumerConstants.KAFKASINK, "fds.detections", KafkaConsumerConstants.RULEPROCESS);
 

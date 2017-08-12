@@ -22,57 +22,9 @@ public class BankingEventSerde {
         logEventSerializer.configure(serdeProps, false);
 
         final Deserializer<LogEvent> logEventDeserializer = new JsonPOJODeserializer<>();
-        serdeProps.put("JsonPOJOClass", NewAccountEvent.class);
+        serdeProps.put("JsonPOJOClass", LogEvent.class);
         logEventDeserializer.configure(serdeProps, false);
 
         return Serdes.serdeFrom(logEventSerializer, logEventDeserializer);
-    }
-
-    public Serde<NewAccountEvent> newAccountEventSerde() {
-        final Serializer<NewAccountEvent> newAccountEventSerializer = new JsonPOJOSerializer<>();
-        serdeProps.put("JsonPOJOClass", NewAccountEvent.class);
-        newAccountEventSerializer.configure(serdeProps, false);
-
-        final Deserializer<NewAccountEvent> newAccountEventDeserializer = new JsonPOJODeserializer<>();
-        serdeProps.put("JsonPOJOClass", NewAccountEvent.class);
-        newAccountEventDeserializer.configure(serdeProps, false);
-
-        return Serdes.serdeFrom(newAccountEventSerializer, newAccountEventDeserializer);
-    }
-
-    public Serde<DepositEvent> depositEventSerde() {
-        final Serializer<DepositEvent> depositEventSerializer = new JsonPOJOSerializer<>();
-        serdeProps.put("JsonPOJOClass", DepositEvent.class);
-        depositEventSerializer.configure(serdeProps, false);
-
-        final Deserializer<DepositEvent> depositEventDeserializer = new JsonPOJODeserializer<>();
-        serdeProps.put("JsonPOJOClass", DepositEvent.class);
-        depositEventDeserializer.configure(serdeProps, false);
-
-        return Serdes.serdeFrom(depositEventSerializer, depositEventDeserializer);
-    }
-
-    public Serde<WithdrawEvent> withdrawEventSerde() {
-        final Serializer<WithdrawEvent> withdrawEventSerializer = new JsonPOJOSerializer<>();
-        serdeProps.put("JsonPOJOClass", WithdrawEvent.class);
-        withdrawEventSerializer.configure(serdeProps, false);
-
-        final Deserializer<WithdrawEvent> withdrawEventDeserializer = new JsonPOJODeserializer<>();
-        serdeProps.put("JsonPOJOClass", WithdrawEvent.class);
-        withdrawEventDeserializer.configure(serdeProps, false);
-
-        return Serdes.serdeFrom(withdrawEventSerializer, withdrawEventDeserializer);
-    }
-
-    public Serde<TransferEvent> transferEventSerde() {
-        final Serializer<TransferEvent> transferEventSerializer = new JsonPOJOSerializer<>();
-        serdeProps.put("JsonPOJOClass", TransferEvent.class);
-        transferEventSerializer.configure(serdeProps, false);
-
-        final Deserializer<TransferEvent> transferEventDeserializer = new JsonPOJODeserializer<>();
-        serdeProps.put("JsonPOJOClass", TransferEvent.class);
-        transferEventDeserializer.configure(serdeProps, false);
-
-        return Serdes.serdeFrom(transferEventSerializer, transferEventDeserializer);
     }
 }

@@ -1,8 +1,8 @@
-package com.bigdata.engineer.fds.event.sink.publisher.apps;
+package com.bigdata.engineer.event.generator.publisher.apps;
 
 import com.bigdata.engineer.event.generator.eventunit.banking.LogEvent;
 import com.bigdata.engineer.event.generator.log.parser.LogParser;
-import com.bigdata.engineer.fds.event.sink.publisher.kafka.KafkaPublisher;
+import com.bigdata.engineer.event.generator.publisher.kafka.KafkaPublisher;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;

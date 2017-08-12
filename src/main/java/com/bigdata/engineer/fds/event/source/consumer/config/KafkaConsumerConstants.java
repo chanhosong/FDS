@@ -20,6 +20,7 @@ public class KafkaConsumerConstants {
     public static final String KAFKASOURCE = "kafkaSource";
     public static final String STOREPROCESS = "storeProcess";
     public static final String RULEPROCESS = "ruleProcess";
+    public static final String RULEPROCESS2 = "ruleProcess2";
     public static final String KAFKASINK = "kafkaSink";
 
 

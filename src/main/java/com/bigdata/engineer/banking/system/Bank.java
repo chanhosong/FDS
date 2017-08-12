@@ -21,6 +21,10 @@ public class Bank {
         logger.info(BankingConstants.LOG_APPENDER + "'{}' Bank Open!", bankID);
     }
 
+    public String getBankID() {
+        return bankID;
+    }
+
     public Customer createAccount(Customer customer, int initialDeposit) {
         Account account = new Account(initialDeposit);
         customer.setAccountID(bankID, registerAccountOnBankDB(customer.getCustomerID(), account));
@@ -46,7 +50,7 @@ public class Bank {
         return account.getAccountID();
     }
 
-    public void work(String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID, String work, int amount) {
-        BankDB.getInstance().runTransactions(customerID, sourceBankID, sourceAccountID, targetCustomerID, targetBankID, targetAccountID, new TransactionsImpl(targetBankID, amount).getTransactionWorkType(work));
+    public void work(String timestamp, String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID, String work, int amount) {
+        BankDB.getInstance().runTransactions(timestamp, customerID, sourceBankID, sourceAccountID, targetCustomerID, targetBankID, targetAccountID, new TransactionsImpl(targetBankID, amount).getTransactionWorkType(work));
     }
 }

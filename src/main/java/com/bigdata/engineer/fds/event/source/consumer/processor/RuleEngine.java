@@ -1,8 +1,11 @@
 package com.bigdata.engineer.fds.event.source.consumer.processor;
 
 import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
+import com.bigdata.engineer.event.generator.eventunit.utils.EventOperations;
 import com.bigdata.engineer.fds.event.source.consumer.config.KafkaConsumerConstants;
-import com.bigdata.engineer.fds.event.source.consumer.domain.*;
+import com.bigdata.engineer.fds.event.source.consumer.domain.FraudDetectionEvent;
+import com.bigdata.engineer.fds.event.source.consumer.domain.LogEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.streams.processor.Processor;
 import org.apache.kafka.streams.processor.ProcessorContext;
@@ -12,24 +15,28 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Locale;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Objects;
 
-public class RuleEngine implements ProcessorSupplier<String, String> {
+public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<String, LogEvent>>> {
     private static final Logger logger = LogManager.getLogger(RuleEngine.class);
 
     @Override
-    public Processor<String, String> get() {
-        return new Processor<String, String>() {
+    public Processor<String, Map<String , Map<String, LogEvent>>> get() {
+        return new Processor<String, Map<String , Map<String, LogEvent>>>() {
             private ProcessorContext context;
-            private KeyValueStore<String, Map<String, LogEvent>> NewAccountEventStore;
+            private KeyValueStore<String, Map<String, LogEvent>> NewAccountEventStore;//Index, CustomerID, Events
             private KeyValueStore<String, Map<String, LogEvent>> DepositEventStore;
             private KeyValueStore<String, Map<String, LogEvent>> WithdrawEventStore;
             private KeyValueStore<String, Map<String, LogEvent>> TransferEventStore;
-            private KeyValueStore<Integer, String> FraudDetections;
+            private DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+            private Instant days7Ago = ZonedDateTime.now().minusDays(7).toInstant();
+            private ObjectMapper mapper = new ObjectMapper();
             private int fraudDetectionsIndex = 0;
 
             @Override
@@ -44,40 +51,124 @@ public class RuleEngine implements ProcessorSupplier<String, String> {
                 this.DepositEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.DepositEvent");
                 this.WithdrawEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.WithdrawEvent");
                 this.TransferEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.TransferEvent");
-                this.FraudDetections = (KeyValueStore<Integer, String>) context.getStateStore("FraudStore.FraudDetections");
             }
 
             @Override
-            public void process(String dummy, String line) {
-                String[] words = line.toLowerCase(Locale.getDefault()).split(" ");
-                ObjectMapper mapper = new ObjectMapper();
-
+            public void process(String type, Map<String , Map<String, LogEvent>> eventMap) {//index, customer, eventLogs
                 try {
-                    for (String word : words) {
-                        logger.info(KafkaConsumerConstants.LOG_APPENDER + word);
-                        if (word.contains(EventConstants.NEW_ACCOUNT_EVENT_LOG_APPENDER.toLowerCase().trim())) {
-                            NewAccountEvent newAccountEvent = mapper.readValue(word, NewAccountEvent.class);
-                            Map<String, LogEvent> n = new HashMap<>();
-                            n.put(newAccountEvent.getAccountid(), newAccountEvent);
-                            this.NewAccountEventStore.put(newAccountEvent.getCustomerid(), n);
-                        } else if (word.contains(EventConstants.DEPOSIT_EVENT_LOG_APPENDER.toLowerCase().trim())) {
-                            DepositEvent depositEvent = mapper.readValue(word, DepositEvent.class);
-                            Map<String, LogEvent> d = new HashMap<>();
-                            d.put(depositEvent.getAccountid(), depositEvent);
-                            this.DepositEventStore.put(depositEvent.getCustomerid(), d);
-                        } else if (word.contains(EventConstants.WITHDRAW_EVENT_LOG_APPENDER.toLowerCase().trim())) {
-                            WithdrawEvent withdrawEvent = mapper.readValue(word, WithdrawEvent.class);
-                            Map<String, LogEvent> w = new HashMap<>();
-                            w.put(withdrawEvent.getAccountid(), withdrawEvent);
-                            this.WithdrawEventStore.put(withdrawEvent.getCustomerid(), w);
-                        } else if (word.contains(EventConstants.TRANSFER_EVENT_LOG_APPENDER.toLowerCase().trim())) {
-                            TransferEvent transferEvent = mapper.readValue(word, TransferEvent.class);
-                            Map<String, LogEvent> t = new HashMap<>();
-                            t.put(transferEvent.getTransferaccount(), transferEvent);
-                            this.TransferEventStore.put(transferEvent.getCustomerid(), t);
-                        }
+                    if (Objects.equals(type, EventConstants.TRANSFER_EVENT_LOG_APPENDER.toLowerCase().trim())) {
+                        eventMap.keySet().forEach(e->{//index로 순환
+                            eventMap.values().forEach(customer-> {
+                                customer.values().forEach(transferEvent->{
+                                    int fraudAmount = Integer.valueOf(transferEvent.getBeforetransferamount()) - Integer.valueOf(transferEvent.getTransferamount());
+
+                                    //1. 이체후에 10000원 이하의 수상한 잔액계좌를 확인한다
+                                    if (!transferEvent.getCustomerid().matches(transferEvent.getReceivecustomerid()) && fraudAmount <= 10000) {
+                                        if (logger.isDebugEnabled()) {
+                                            logger.info("Step1. 비정상 감지경고(잔액이 10000원 이하):: "
+                                                    + "이체한날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(transferEvent.getTimestamp())).atZone(ZoneId.systemDefault()))
+                                                    + ", 고객이름: " + transferEvent.getCustomerid()
+                                                    + ", 이체 계좌: " + transferEvent.getTransferaccount()
+                                                    + ", 이체 했었던 금액: "+ transferEvent.getTransferamount()
+                                                    + ", 이체 직전 잔액: " + transferEvent.getBeforetransferamount()
+                                                    + ", 이체후 잔액: " + fraudAmount);
+                                        }
+
+                                        //2. 신규로 계좌를 만든지 7일이하인지 확인한다
+                                        this.NewAccountEventStore.all().forEachRemaining(indexStore-> {
+                                            if (!Objects.equals(indexStore.value, null) && !Objects.equals(indexStore.value.get(transferEvent.getCustomerid()),null)) {
+                                                LogEvent customerValue = indexStore.value.get(transferEvent.getCustomerid());
+
+                                                if(!Instant.ofEpochMilli(Long.valueOf(transferEvent.getTimestamp())).isBefore(days7Ago)) {//계좌를 만든지 7일이 안지남 - 바정상
+                                                    if(transferEvent.getTransferaccount().contains(customerValue.getAccountid())) {
+                                                        if (logger.isWarnEnabled()) {
+                                                            logger.info("Step2. 비정상 감지경고(잔액이 10000원이하면서 7일이내의 신규계좌):: "
+                                                                    + "이체한 날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(transferEvent.getTimestamp())).atZone(ZoneId.systemDefault()))
+                                                                    + ", 계좌를 만든날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(customerValue.getTimestamp())).atZone(ZoneId.systemDefault()))
+                                                                    + ", 고객이름: " + customerValue.getCustomerid()
+                                                                    + ", 계좌번호: " + customerValue.getAccountid());
+                                                        }
+                                                        this.DepositEventStore.all().forEachRemaining(d->{
+                                                            if (!Objects.equals(d.value, null) && !Objects.equals(d.value.get(customerValue.getCustomerid()), null)) {
+                                                                LogEvent depositEvent = d.value.get(customerValue.getCustomerid());
+                                                                if ( 900000 <= Integer.valueOf(depositEvent.getCreditamount()) && Integer.valueOf(depositEvent.getCreditamount()) <= 1000000) {
+                                                                    if (logger.isWarnEnabled()) {
+                                                                        logger.warn("Step3. 비정상 감지경고 입금내역(7일이내 입금한 금액이 90-100만원이상):: "
+                                                                                + "이체한 날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(transferEvent.getTimestamp())).atZone(ZoneId.systemDefault()))
+                                                                                + ", 입금날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(depositEvent.getTimestamp())).atZone(ZoneId.systemDefault()))
+                                                                                + ", 고객이름: " + depositEvent.getCustomerid()
+                                                                                + ", 계좌번호: " + depositEvent.getAccountid()
+                                                                                + ", 입금액: " + depositEvent.getCreditamount());
+                                                                    }
+                                                                    this.WithdrawEventStore.all().forEachRemaining(w->{
+                                                                        if (!Objects.equals(w.value, null) && !Objects.equals(w.value.get(customerValue.getCustomerid()), null)) {
+                                                                            LogEvent withdrawEvent = w.value.get(customerValue.getCustomerid());
+                                                                            Instant depositTimestamp = Instant.ofEpochMilli(Long.valueOf(depositEvent.getTimestamp()));
+                                                                            Instant withdrawTimestamp = Instant.ofEpochMilli(Long.valueOf(withdrawEvent.getTimestamp()));
+
+                                                                            if(ChronoUnit.SECONDS.between(depositTimestamp, withdrawTimestamp) <= 7200) {//2시간 이내에 출금된 기록을 확인함
+                                                                                if (logger.isDebugEnabled()) {
+                                                                                    logger.warn("Step4. 비정상 감지경고(출금시간이 2시간이내):: "
+                                                                                            + "출금한 날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(withdrawEvent.getTimestamp())).atZone(ZoneId.systemDefault()))
+                                                                                            + ", 입금한날짜: " + formatter.format(Instant.ofEpochMilli(Long.valueOf(depositEvent.getTimestamp())).atZone(ZoneId.systemDefault()))
+                                                                                            + ", 고객이름: " + withdrawEvent.getCustomerid()
+                                                                                            + ", 계좌번호: " + withdrawEvent.getAccountid()
+                                                                                            + ", 출금액: " + withdrawEvent.getDebitamount());
+                                                                                }
+
+                                                                                FraudDetectionEvent fraudDetectionEvent = new FraudDetectionEvent();
+                                                                                fraudDetectionEvent.setType(EventConstants.FRAUD_DETECTION_EVENT_LOG_APPENDER);
+                                                                                fraudDetectionEvent.setTimestamp(EventOperations.getTimestamp());
+                                                                                fraudDetectionEvent.setCustomerid(withdrawEvent.getCustomerid());
+                                                                                fraudDetectionEvent.setAccountid(customerValue.getAccountid());
+                                                                                fraudDetectionEvent.setTransferaccount(transferEvent.getTransferaccount());
+                                                                                fraudDetectionEvent.setBeforetransferamount(transferEvent.getBeforetransferamount());
+                                                                                fraudDetectionEvent.setReceivebankname(transferEvent.getReceivebankname());
+                                                                                fraudDetectionEvent.setReceivecustomerid(transferEvent.getReceivecustomerid());
+                                                                                fraudDetectionEvent.setCreditamount(depositEvent.getCreditamount());
+                                                                                fraudDetectionEvent.setDebitamount(withdrawEvent.getDebitamount());
+                                                                                fraudDetectionEvent.setTransferamount(transferEvent.getTransferamount());
+
+                                                                                String fraudDetectionEventJSON = null;
+                                                                                try {
+                                                                                    fraudDetectionEventJSON = mapper.writeValueAsString(fraudDetectionEvent);
+                                                                                } catch (JsonProcessingException e1) {
+                                                                                    e1.printStackTrace();
+                                                                                }
+//
+                                                                                logger.error("Step5. 최종 비정상 이체내역::  " + fraudDetectionEventJSON);
+
+                                                                                nextProcess(String.valueOf(fraudDetectionsIndex++), fraudDetectionEventJSON);
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        });
+
+
+                                        /*next process*/
+//                                        this.NewAccountEventStore.all().forEachRemaining(a->{
+//                                            if (!Objects.equals(a.value, null)) {
+//                                                ((Map) a.value).values().forEach(f->{//Map<Integer, LogEvent>
+//                                                    ((Map) a.value).keySet().forEach(g->{
+//                                                        if (((LogEvent) f).getTimestamp() == customervalues.getTimestamp())//2. 신규로 계좌를 만든지 7일
+//                                                        System.out.println(KafkaConsumerConstants.LOG_APPENDER + "[" + g + ", " + ((LogEvent) f).getType() + ", " + a.key + ", " +  ((LogEvent) f).getTimestamp() + ", " + ((LogEvent) f).getAccountid() + ", " + ((LogEvent) f).getCreditamount() + ", " + ((LogEvent) f).getDebitamount() + ", " + ((LogEvent) f).getBeforetransferamount() + ", " + ((LogEvent) f).getReceivebankname() + ", " + ((LogEvent) f).getReceivecustomerid() + ", " + ((LogEvent) f).getTransferaccount() + ", " + ((LogEvent) f).getTransferamount() + "]");
+//                                                    });
+//                                                });
+//                                            }
+//                                        });
+//                                        nextProcess(customervalues.getCustomerid(), customervalues.getTransferaccount());
+                                    }
+                                });
+                            });
+                        });
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 // commit the current processing progress
@@ -86,39 +177,31 @@ public class RuleEngine implements ProcessorSupplier<String, String> {
 
             @Override
             public void punctuate(long timestamp) {
-                print(this.NewAccountEventStore.name(), this.NewAccountEventStore.all(), timestamp);
-                print(this.DepositEventStore.name(), this.DepositEventStore.all(), timestamp);
-                print(this.WithdrawEventStore.name(), this.WithdrawEventStore.all(), timestamp);
-                print(this.TransferEventStore.name(), this.TransferEventStore.all(), timestamp);
-                //TODO 감지한 이상이벤트들을 보낼것
-//                send(this.FraudDetections.name(), this.FraudDetections.range(this.fraudDetectionsIndex, 100), timestamp);
+                if (logger.isDebugEnabled()) {
+                    print(this.NewAccountEventStore.name(), this.NewAccountEventStore.all(), timestamp);
+                    print(this.DepositEventStore.name(), this.DepositEventStore.all(), timestamp);
+                    print(this.WithdrawEventStore.name(), this.WithdrawEventStore.all(), timestamp);
+                    print(this.TransferEventStore.name(), this.TransferEventStore.all(), timestamp);
+                }
             }
 
             private void print(String name, KeyValueIterator<String, Map<String, LogEvent>> iter, long timestamp) {
-                System.out.println("----------- " + name + " " + timestamp + " ----------- ");
+                logger.debug("----------- " + name + " " + timestamp + " ----------- ");
 
                 iter.forEachRemaining(e->{
                     if (!Objects.equals(e.value, null)) {
-                        ((Map) e.value).values().forEach(f->{
-                            System.out.println("[" + ((LogEvent) f).getType() + ", " +  ((LogEvent) f).getTimestamp() + ", " + e.key + ", " + ((LogEvent) f).getAccountid() + ", " + ((LogEvent) f).getCreditamount() + ", " + ((LogEvent) f).getDebitamount() + ", " + ((LogEvent) f).getBeforetransferamount() + ", " + ((LogEvent) f).getReceivebankname() + ", " + ((LogEvent) f).getReceivecustomerid() + ", " + ((LogEvent) f).getTransferaccount() + ", " + ((LogEvent) f).getTransferamount() + "]");
+                        ((Map) e.value).values().forEach(f->{//Map<Integer, LogEvent>
+                            ((Map) e.value).keySet().forEach(g->{
+                               logger.debug(KafkaConsumerConstants.LOG_APPENDER + "[" + g + ", " + ((LogEvent) f).getType() + ", " + e.key + ", " +  ((LogEvent) f).getTimestamp() + ", " + ((LogEvent) f).getAccountid() + ", " + ((LogEvent) f).getCreditamount() + ", " + ((LogEvent) f).getDebitamount() + ", " + ((LogEvent) f).getBeforetransferamount() + ", " + ((LogEvent) f).getReceivebankname() + ", " + ((LogEvent) f).getReceivecustomerid() + ", " + ((LogEvent) f).getTransferaccount() + ", " + ((LogEvent) f).getTransferamount() + "]");
+                            });
                         });
                     }
                 });
             }
 
-            private void send(String name, KeyValueStore<Integer, String> iter, long timestamp) {//(index, json) foramet
-                System.out.println("----------- " + name + " " + timestamp + " ----------- ");
-
-//                iter.forEachRemaining(e->{
-//                    if (!Objects.equals(e.value, null)) {
-//                        ((Map) e.value).values().forEach(f->{
-//                            System.out.println("[" + e.key + ", " + ((LogEvent)f).getTimestamp() + ", " + ((LogEvent)f).getType() + "]");
-//                        });
-//                    }
-//                });
-//
-                //TODO JSON으로 변환해서 이상이벤트들을 보낼것
-//                context.forward(entry.key, entry.value.toString());//sending message to 'fds.detections' topic
+            private void nextProcess(String index, String json) {
+                context.forward(index, json);
+                context.commit();
             }
 
             @Override

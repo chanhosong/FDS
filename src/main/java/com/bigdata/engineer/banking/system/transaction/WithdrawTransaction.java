@@ -14,11 +14,21 @@ public class WithdrawTransaction extends TransactionsImpl {
     }
 
     @Override
-    public int debitAmount(String customerID, String sourceBankID, String sourceAccountID) {
-        int balance = super.debitAmount(customerID, sourceBankID, sourceAccountID);
-        if (logger.isDebugEnabled()){//Customer has withdrawn 1,000 won from the bank.
-            logger.debug(BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has withdrew '${}' in '{}' bank '{}' (Before balance '${}' After balance '${}')", customerID, amount, sourceBankID, sourceAccountID, balance-amount, balance);
-        }
+    public int debitAmount(String timestamp, String customerID, String sourceBankID, String sourceAccountID) {
+        int balance = super.debitAmount(timestamp, customerID, sourceBankID, sourceAccountID);
+
+//        if (balance - amount > 0) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has withdrew '{}' in '{}' bank '{}' (Before balance '{}' After balance '{}')",
+                        customerID,
+                        amount,
+                        sourceBankID,
+                        sourceAccountID,
+                        balance,
+                        balance - amount);
+            }
+//        }
+
         return balance;
     }//출금잔고
 }

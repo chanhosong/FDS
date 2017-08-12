@@ -25,10 +25,14 @@ public class StoreProcessorSupplier implements ProcessorSupplier<String, String>
     public Processor<String, String> get() {
         return new Processor<String, String>() {
             private ProcessorContext context;
-            private KeyValueStore<String, Map<String, LogEvent>> NewAccountEventStore;
+            private KeyValueStore<String , Map<String, LogEvent>> NewAccountEventStore;//Index, CustomerID, Events
             private KeyValueStore<String, Map<String, LogEvent>> DepositEventStore;
             private KeyValueStore<String, Map<String, LogEvent>> WithdrawEventStore;
             private KeyValueStore<String, Map<String, LogEvent>> TransferEventStore;
+            private int newAccountIndex = 0;
+            private int depositIndex = 0;
+            private int withdrawIndex = 0;
+            private int transferIndex = 0;
 
             @Override
             @SuppressWarnings("unchecked")
@@ -38,7 +42,7 @@ public class StoreProcessorSupplier implements ProcessorSupplier<String, String>
                 // call this processor's punctuate() method every 1000 milliseconds.
                 this.context.schedule(1000);
                 // retrieve the key-value store named "FraudStore"
-                this.NewAccountEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.NewAccountEvent");
+                this.NewAccountEventStore = (KeyValueStore<String, Map<String , LogEvent>>) context.getStateStore("FraudStore.NewAccountEvent");
                 this.DepositEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.DepositEvent");
                 this.WithdrawEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.WithdrawEvent");
                 this.TransferEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore("FraudStore.TransferEvent");
@@ -51,39 +55,49 @@ public class StoreProcessorSupplier implements ProcessorSupplier<String, String>
 
                 try {
                     for (String word : words) {
-                        logger.info(KafkaConsumerConstants.LOG_APPENDER + word);
+                        String index;
+                        Map<String , Map<String , LogEvent>> result = new HashMap<>();
+                        Map<String , LogEvent> logEventMap = new HashMap<>();
+//                        logger.info(KafkaConsumerConstants.LOG_APPENDER + word);
                         if (word.contains(EventConstants.NEW_ACCOUNT_EVENT_LOG_APPENDER.toLowerCase().trim())) {
                             NewAccountEvent newAccountEvent = mapper.readValue(word, NewAccountEvent.class);
-                            Map<String, LogEvent> n = new HashMap<>();
-                            n.put(newAccountEvent.getAccountid(), newAccountEvent);
-                            this.NewAccountEventStore.put(newAccountEvent.getCustomerid(), n);
+                            logEventMap.put(newAccountEvent.getCustomerid(), newAccountEvent);
+                            index = String.valueOf(newAccountIndex++);
+                            result.put(index, logEventMap);
+                            this.NewAccountEventStore.put(index, logEventMap);
+                            nextProcess(newAccountEvent.getType(),result);
                         } else if (word.contains(EventConstants.DEPOSIT_EVENT_LOG_APPENDER.toLowerCase().trim())) {
                             DepositEvent depositEvent = mapper.readValue(word, DepositEvent.class);
-                            Map<String, LogEvent> d = new HashMap<>();
-                            d.put(depositEvent.getAccountid(), depositEvent);
-                            this.DepositEventStore.put(depositEvent.getCustomerid(), d);
+                            logEventMap.put(depositEvent.getCustomerid(), depositEvent);
+                            index = String.valueOf(depositIndex++);
+                            result.put(index, logEventMap);
+                            this.DepositEventStore.put(index, logEventMap);
+                            nextProcess(depositEvent.getType(),result);
                         } else if (word.contains(EventConstants.WITHDRAW_EVENT_LOG_APPENDER.toLowerCase().trim())) {
                             WithdrawEvent withdrawEvent = mapper.readValue(word, WithdrawEvent.class);
-                            Map<String, LogEvent> w = new HashMap<>();
-                            w.put(withdrawEvent.getAccountid(), withdrawEvent);
-                            this.WithdrawEventStore.put(withdrawEvent.getCustomerid(), w);
+                            logEventMap.put(withdrawEvent.getCustomerid(), withdrawEvent);
+                            index = String.valueOf(withdrawIndex++);
+                            result.put(index, logEventMap);
+                            this.WithdrawEventStore.put(index, logEventMap);
+                            nextProcess(withdrawEvent.getType(),result);
                         } else if (word.contains(EventConstants.TRANSFER_EVENT_LOG_APPENDER.toLowerCase().trim())) {
                             TransferEvent transferEvent = mapper.readValue(word, TransferEvent.class);
-                            Map<String, LogEvent> t = new HashMap<>();
-                            t.put(transferEvent.getTransferaccount(), transferEvent);
-                            this.TransferEventStore.put(transferEvent.getCustomerid(), t);
+                            logEventMap.put(transferEvent.getCustomerid(), transferEvent);
+                            index = String.valueOf(transferIndex++);
+                            result.put(index, logEventMap);
+                            this.TransferEventStore.put(index, logEventMap);
+                            nextProcess(transferEvent.getType(),result);
                         }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                // commit the current processing progress
                 context.commit();
             }
 
             @Override
             public void punctuate(long timestamp) {
-                if (logger.isDebugEnabled()) {
+                if (logger.isTraceEnabled()) {
                     print(this.NewAccountEventStore.name(), this.NewAccountEventStore.all(), timestamp);
                     print(this.DepositEventStore.name(), this.DepositEventStore.all(), timestamp);
                     print(this.WithdrawEventStore.name(), this.WithdrawEventStore.all(), timestamp);
@@ -91,16 +105,23 @@ public class StoreProcessorSupplier implements ProcessorSupplier<String, String>
                 }
             }
 
-            private void print(String name, KeyValueIterator<String, Map<String, LogEvent>> iter, long timestamp) {
-                logger.debug("----------- " + name + " " + timestamp + " ----------- ");
+            private void print(String name, KeyValueIterator<String, Map<String , LogEvent>> iter, long timestamp) {
+                logger.trace("----------- " + name + " " + timestamp + " ----------- ");
 
                 iter.forEachRemaining(e->{
                     if (!Objects.equals(e.value, null)) {
-                        ((Map) e.value).values().forEach(f->{
-                            logger.debug(KafkaConsumerConstants.LOG_APPENDER + "[" + ((LogEvent) f).getType() + ", " +  ((LogEvent) f).getTimestamp() + ", " + e.key + ", " + ((LogEvent) f).getAccountid() + ", " + ((LogEvent) f).getCreditamount() + ", " + ((LogEvent) f).getDebitamount() + ", " + ((LogEvent) f).getBeforetransferamount() + ", " + ((LogEvent) f).getReceivebankname() + ", " + ((LogEvent) f).getReceivecustomerid() + ", " + ((LogEvent) f).getTransferaccount() + ", " + ((LogEvent) f).getTransferamount() + "]");
+                        ((Map) e.value).values().forEach(f->{//Map<Integer, LogEvent>
+                            ((Map) e.value).keySet().forEach(g->{
+                                logger.trace(KafkaConsumerConstants.LOG_APPENDER + "[" +  g + ", " + ((LogEvent) f).getType() + ", " + e.key + ", " +  ((LogEvent) f).getTimestamp() + ", " + ((LogEvent) f).getAccountid() + ", " + ((LogEvent) f).getCreditamount() + ", " + ((LogEvent) f).getDebitamount() + ", " + ((LogEvent) f).getBeforetransferamount() + ", " + ((LogEvent) f).getReceivebankname() + ", " + ((LogEvent) f).getReceivecustomerid() + ", " + ((LogEvent) f).getTransferaccount() + ", " + ((LogEvent) f).getTransferamount() + "]");
+                            });
                         });
                     }
                 });
+            }
+
+            private void nextProcess(String type, Map<String , Map<String, LogEvent>> map) {
+                context.forward(type, map);
+                context.commit();
             }
 
             @Override

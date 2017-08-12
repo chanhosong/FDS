@@ -31,25 +31,54 @@ public class TransactionsImpl implements Transactions {
     }
 
     @Override
-    public int creditAmount(String customerID, String sourceBankID, String sourceAccountID) {
+    public int creditAmount(String timestamp, String customerID, String sourceBankID, String sourceAccountID) {
         Map<String, Integer> account = bankDB.get(customerID);
         int balance = account.get(sourceAccountID);
         int creditAmount = balance + amount;
+
+
+//        if (balance > 0 && creditAmount + amount > 0) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(BankingConstants.DEPOSIT_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has deposited '{}' in '{}' bank '{}' (Before balance '{}' After balance '{}')",
+                        customerID,
+                        amount,
+                        sourceBankID,
+                        sourceAccountID,
+                        balance,
+                        creditAmount);
+            }
+//        }
 
         account.put(sourceAccountID, creditAmount);
         return creditAmount;//입금잔고
     }
 
     @Override
-    public int debitAmount(String customerID, String sourceBankID, String sourceAccountID) {
+    public int debitAmount(String timestamp, String customerID, String sourceBankID, String sourceAccountID) {
         Map<String, Integer> account = bankDB.get(customerID);
         int balance = account.get(sourceAccountID);
-        int creditAmount = balance - amount;
+        int debitAmount = balance - amount;
 
-        account.put(sourceAccountID, creditAmount);
-        return creditAmount;//출금잔고
+
+//        if (debitAmount - amount > 0) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(BankingConstants.WITHDRAW_TRANSACTION_LOG_APPENDER + "CustomerID '{}' has withdrew '{}' in '{}' bank '{}' (Before balance '{}' After balance '{}')",
+                        customerID,
+                        amount,
+                        sourceBankID,
+                        sourceAccountID,
+                        balance,
+                        debitAmount);
+            }
+//        }
+
+        account.put(sourceAccountID, debitAmount);
+        return debitAmount;//출금잔고
     }
 
     @Override
-    public void transferAmount(String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID) {}
+    public void transferAmount(String timestamp, String customerID, String sourceBankID, String sourceAccountID, String targetCustomerID, String targetBankID, String targetAccountID) {
+        int debitAmount = this.debitAmount(timestamp, customerID, sourceBankID, sourceAccountID);//1. 먼저 출금을 한다
+        int creditAmount = this.creditAmount(timestamp, customerID, targetBankID, targetAccountID);//2. 다음 입금을 한다
+    }
 }
