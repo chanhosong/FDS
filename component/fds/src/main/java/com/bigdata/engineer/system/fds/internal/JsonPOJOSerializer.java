@@ -1,4 +1,4 @@
-package com.bigdata.engineer.fds.consumer.internal;
+package com.bigdata.engineer.system.fds.internal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;

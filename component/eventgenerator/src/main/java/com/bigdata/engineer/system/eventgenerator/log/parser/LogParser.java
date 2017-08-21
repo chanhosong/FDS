@@ -1,7 +1,7 @@
-package com.bigdata.engineer.event.generator.log.parser;
+package com.bigdata.engineer.system.eventgenerator.log.parser;
 
-import com.bigdata.engineer.event.generator.eventunit.banking.*;
-import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
+import com.bigdata.engineer.system.eventgenerator.eventunit.banking.*;
+import com.bigdata.engineer.system.eventgenerator.eventunit.config.EventConstants;
 import com.github.javafaker.Faker;
 import org.apache.logging.log4j.LogManager;
 

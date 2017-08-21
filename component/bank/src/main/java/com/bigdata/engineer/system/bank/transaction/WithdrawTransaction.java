@@ -1,6 +1,6 @@
-package com.bigdata.engineer.banking.system.transaction;
+package com.bigdata.engineer.system.bank.transaction;
 
-import com.bigdata.engineer.banking.system.config.BankingConstants;
+import com.bigdata.engineer.system.bank.config.BankingConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

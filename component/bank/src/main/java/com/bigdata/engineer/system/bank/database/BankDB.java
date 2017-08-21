@@ -1,9 +1,9 @@
-package com.bigdata.engineer.banking.system.database;
+package com.bigdata.engineer.system.bank.database;
 
-import com.bigdata.engineer.banking.system.transaction.DepositTransaction;
-import com.bigdata.engineer.banking.system.transaction.TransactionsImpl;
-import com.bigdata.engineer.banking.system.transaction.TransferTransaction;
-import com.bigdata.engineer.banking.system.transaction.WithdrawTransaction;
+import com.bigdata.engineer.system.bank.transaction.TransferTransaction;
+import com.bigdata.engineer.system.bank.transaction.DepositTransaction;
+import com.bigdata.engineer.system.bank.transaction.TransactionsImpl;
+import com.bigdata.engineer.system.bank.transaction.WithdrawTransaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

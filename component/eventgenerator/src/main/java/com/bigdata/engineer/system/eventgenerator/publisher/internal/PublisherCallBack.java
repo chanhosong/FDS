@@ -1,4 +1,4 @@
-package com.bigdata.engineer.event.generator.publisher.internal;
+package com.bigdata.engineer.system.eventgenerator.publisher.internal;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.RecordMetadata;

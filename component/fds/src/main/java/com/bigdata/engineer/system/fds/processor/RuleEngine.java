@@ -1,10 +1,10 @@
-package com.bigdata.engineer.fds.consumer.processor;
+package com.bigdata.engineer.system.fds.processor;
 
-import com.bigdata.engineer.fds.consumer.config.FDSConstants;
-import com.bigdata.engineer.fds.consumer.config.KafkaConsumerConstants;
-import com.bigdata.engineer.fds.consumer.domain.FraudDetectionEvent;
-import com.bigdata.engineer.fds.consumer.domain.LogEvent;
-import com.bigdata.engineer.fds.consumer.util.FDSOperations;
+import com.bigdata.engineer.system.fds.config.FDSConstants;
+import com.bigdata.engineer.system.fds.config.KafkaConsumerConstants;
+import com.bigdata.engineer.system.fds.domain.FraudDetectionEvent;
+import com.bigdata.engineer.system.fds.domain.LogEvent;
+import com.bigdata.engineer.system.fds.util.FDSOperations;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.streams.processor.Processor;
@@ -47,7 +47,8 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                 // call this processor's punctuate() method every 1000 milliseconds.
                 this.context.schedule(1000);
                 // retrieve the key-value store named "FraudStore"
-                this.NewAccountEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(KafkaConsumerConstants.FRAUDSTORE_NEWACCOUNT);
+                this.NewAccountEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(
+                        KafkaConsumerConstants.FRAUDSTORE_NEWACCOUNT);
                 this.DepositEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(KafkaConsumerConstants.FRAUDSTORE_DEPOSITEVENT);
                 this.WithdrawEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(KafkaConsumerConstants.FRAUDSTORE_WITHDRAWEVENT);
                 this.TransferEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(KafkaConsumerConstants.FRAUDSTORE_TRANSFEREVENT);
@@ -118,7 +119,8 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
 
                                                                                 FraudDetectionEvent fraudDetectionEvent = new FraudDetectionEvent();
                                                                                 fraudDetectionEvent.setType(FDSConstants.FRAUD_DETECTION_EVENT_LOG_APPENDER);
-                                                                                fraudDetectionEvent.setTimestamp(FDSOperations.getTimestamp());
+                                                                                fraudDetectionEvent.setTimestamp(
+                                                                                        FDSOperations.getTimestamp());
                                                                                 fraudDetectionEvent.setCustomerid(withdrawEvent.getCustomerid());
                                                                                 fraudDetectionEvent.setAccountid(customerValue.getAccountid());
                                                                                 fraudDetectionEvent.setTransferaccount(transferEvent.getTransferaccount());

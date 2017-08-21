@@ -1,4 +1,4 @@
-package com.bigdata.engineer.fds.consumer.config;
+package com.bigdata.engineer.system.fds.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;

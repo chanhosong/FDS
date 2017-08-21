@@ -1,4 +1,4 @@
-package com.bigdata.engineer.fds.consumer.util;
+package com.bigdata.engineer.system.fds.util;
 
 import java.time.Instant;
 

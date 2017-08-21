@@ -1,10 +1,12 @@
-package com.bigdata.engineer.fds.consumer.actor;
+package com.bigdata.engineer.system.fds.actor;
 
-import com.bigdata.engineer.fds.consumer.config.KafkaConfigOperations;
-import com.bigdata.engineer.fds.consumer.config.KafkaConsumerConstants;
-import com.bigdata.engineer.fds.consumer.internal.BankingEventSerde;
-import com.bigdata.engineer.fds.consumer.processor.RuleEngine;
-import com.bigdata.engineer.fds.consumer.processor.StoreProcessorSupplier;
+import com.bigdata.engineer.system.fds.config.KafkaConfigOperations;
+import com.bigdata.engineer.system.fds.config.KafkaConsumerConstants;
+import com.bigdata.engineer.system.fds.internal.BankingEventSerde;
+import com.bigdata.engineer.system.fds.processor.RuleEngine;
+import com.bigdata.engineer.system.fds.processor.StoreProcessorSupplier;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.kafka.common.utils.Exit;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.processor.TopologyBuilder;
@@ -16,6 +18,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ *
+ * @author ChanHo Song
+ */
+@Component(name="fds-service")
+@Service
 public class FraudDetectionProcessorImpl implements FraudDetectionProcessor {
     private static final Logger logger = LogManager.getLogger(FraudDetectionProcessorImpl.class);
 

@@ -1,7 +1,7 @@
-package com.bigdata.engineer.fds.consumer;
+package com.bigdata.engineer.system.fds;
 
-import com.bigdata.engineer.fds.consumer.actor.FraudDetectionProcessor;
-import com.bigdata.engineer.fds.consumer.actor.FraudDetectionProcessorImpl;
+import com.bigdata.engineer.system.fds.actor.FraudDetectionProcessor;
+import com.bigdata.engineer.system.fds.actor.FraudDetectionProcessorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.osgi.framework.*;

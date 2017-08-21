@@ -1,4 +1,4 @@
-package com.bigdata.engineer.event.generator.publisher.kafka.config;
+package com.bigdata.engineer.system.eventgenerator.publisher.kafka.config;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsConfig;

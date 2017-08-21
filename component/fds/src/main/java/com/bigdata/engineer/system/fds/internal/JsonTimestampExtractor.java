@@ -1,9 +1,9 @@
-package com.bigdata.engineer.fds.consumer.internal;
+package com.bigdata.engineer.system.fds.internal;
 
-import com.bigdata.engineer.fds.consumer.domain.DepositEvent;
-import com.bigdata.engineer.fds.consumer.domain.NewAccountEvent;
-import com.bigdata.engineer.fds.consumer.domain.TransferEvent;
-import com.bigdata.engineer.fds.consumer.domain.WithdrawEvent;
+import com.bigdata.engineer.system.fds.domain.DepositEvent;
+import com.bigdata.engineer.system.fds.domain.NewAccountEvent;
+import com.bigdata.engineer.system.fds.domain.TransferEvent;
+import com.bigdata.engineer.system.fds.domain.WithdrawEvent;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;

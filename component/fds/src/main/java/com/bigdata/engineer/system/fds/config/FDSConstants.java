@@ -1,4 +1,4 @@
-package com.bigdata.engineer.fds.consumer.config;
+package com.bigdata.engineer.system.fds.config;
 
 public class FDSConstants {
     /*------------------------------------------------------------------------------------------*/

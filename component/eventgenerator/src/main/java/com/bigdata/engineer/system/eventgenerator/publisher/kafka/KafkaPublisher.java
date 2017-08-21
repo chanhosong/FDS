@@ -1,6 +1,6 @@
-package com.bigdata.engineer.event.generator.publisher.kafka;
+package com.bigdata.engineer.system.eventgenerator.publisher.kafka;
 
-import com.bigdata.engineer.event.generator.publisher.internal.PublisherCallBack;
+import com.bigdata.engineer.system.eventgenerator.publisher.internal.PublisherCallBack;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;

@@ -1,4 +1,4 @@
-package com.bigdata.engineer.event.generator.publisher.kafka;
+package com.bigdata.engineer.system.eventgenerator.publisher.kafka;
 
 import java.util.concurrent.ExecutionException;
 

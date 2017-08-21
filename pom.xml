@@ -5,12 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.bigdata.engineer.system</groupId>
-    <artifactId>FDS</artifactId>
+    <artifactId>Root</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>component</module>
+        <module>feature</module>
     </modules>
 
     <build>
@@ -18,7 +19,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.6.2</version>
                 <configuration>
                     <compilerVersion>${project.build.compile.version}</compilerVersion>
                     <source>${project.build.source.version}</source>
@@ -27,42 +28,43 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>
-                                com.bigdata.engineer.fds.event.source.consumer.FraudDetectionProcessor.Bootstrap
-                            </mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <finalName>fraud-detection-system</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <!-- this is used for inheritance merges -->
-                        <phase>package</phase>
-                        <!-- bind to the packaging phase -->
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-assembly-plugin</artifactId>-->
+                <!--<configuration>-->
+                    <!--<archive>-->
+                        <!--<manifest>-->
+                            <!--<mainClass>-->
+                                <!--com.bigdata.engineer.fds.event.source.consumer.FraudDetectionProcessor.Bootstrap-->
+                            <!--</mainClass>-->
+                        <!--</manifest>-->
+                    <!--</archive>-->
+                    <!--<descriptorRefs>-->
+                        <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+                    <!--</descriptorRefs>-->
+                    <!--<finalName>fraud-detection-system</finalName>-->
+                    <!--<appendAssemblyId>false</appendAssemblyId>-->
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>make-assembly</id>-->
+                        <!--&lt;!&ndash; this is used for inheritance merges &ndash;&gt;-->
+                        <!--<phase>package</phase>-->
+                        <!--&lt;!&ndash; bind to the packaging phase &ndash;&gt;-->
+                        <!--<goals>-->
+                            <!--<goal>single</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>3.3.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>Service listener example</Bundle-Name>
                         <Bundle-Description>A bundle that displays messages at startup and when service events occur</Bundle-Description>
                         <Bundle-Vendor>Apache Felix</Bundle-Vendor>
@@ -81,19 +83,19 @@
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-streams</artifactId>
-                <version>0.11.0.0</version>
+                <version>${org.apche.kafka.version}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
-                <version>2.8.2</version>
+                <version>${org.apache.version}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
-                <version>2.8.2</version>
+                <version>${org.apache.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -117,13 +119,25 @@
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.core</artifactId>
-                <version>6.0.0</version>
+                <version>${org.osgi.core.version}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.apache.felix/org.apache.felix.framework -->
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.framework</artifactId>
-                <version>5.6.6</version>
+                <version>${org.apache.felix.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.felix/maven-scr-plugin -->
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <version>${org.apache.felix.src.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.felix/org.apache.felix.scr.annotations -->
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.scr.annotations</artifactId>
+                <version>1.12.0</version>
             </dependency>
 
 
@@ -172,8 +186,12 @@
         <project.build.source.version>1.8</project.build.source.version>
         <project.build.target.version>1.8</project.build.target.version>
 
-        <project-base-package>${project.groupId}.fds</project-base-package>
+        <project-base-package>${project.groupId}</project-base-package>
 
-
+        <org.apche.kafka.version>0.11.0.0</org.apche.kafka.version>
+        <org.apache.version>2.8.2</org.apache.version>
+        <org.apache.felix.version>5.6.6</org.apache.felix.version>
+        <org.apache.felix.src.version>1.24.0</org.apache.felix.src.version>
+        <org.osgi.core.version>6.0.0</org.osgi.core.version>
     </properties>
 </project>

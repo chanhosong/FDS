@@ -1,4 +1,4 @@
-package com.bigdata.engineer.banking.system.utils;
+package com.bigdata.engineer.system.bank.utils;
 
 import java.time.Instant;
 

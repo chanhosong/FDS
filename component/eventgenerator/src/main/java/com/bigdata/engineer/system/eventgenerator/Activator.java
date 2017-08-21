@@ -1,7 +1,7 @@
-package com.bigdata.engineer.event.generator;
+package com.bigdata.engineer.system.eventgenerator;
 
-import com.bigdata.engineer.event.generator.actor.EventGenerator;
-import com.bigdata.engineer.event.generator.actor.EventGeneratorImpl;
+import com.bigdata.engineer.system.eventgenerator.actor.EventGenerator;
+import com.bigdata.engineer.system.eventgenerator.actor.EventGeneratorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.osgi.framework.*;

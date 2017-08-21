@@ -1,11 +1,14 @@
-package com.bigdata.engineer.event.generator.actor;
+package com.bigdata.engineer.system.eventgenerator.actor;
 
-import com.bigdata.engineer.banking.system.actor.Bank;
-import com.bigdata.engineer.banking.system.actor.Customer;
-import com.bigdata.engineer.banking.system.config.BankingConstants;
-import com.bigdata.engineer.event.generator.eventunit.config.EventConstants;
-import com.bigdata.engineer.event.generator.publisher.apps.KafkaPublisherApp;
+import com.bigdata.engineer.system.bank.actor.Bank;
+import com.bigdata.engineer.system.bank.actor.Customer;
+import com.bigdata.engineer.system.bank.config.BankingConstants;
+import com.bigdata.engineer.system.eventgenerator.eventunit.config.EventConstants;
+import com.bigdata.engineer.system.eventgenerator.eventunit.utils.EventOperations;
+import com.bigdata.engineer.system.eventgenerator.publisher.apps.KafkaPublisherApp;
 import com.github.javafaker.Faker;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,8 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.bigdata.engineer.event.generator.eventunit.utils.EventOperations.getTimestamp;
-
+/**
+ *
+ * @author ChanHo Song
+ */
+@Component(name="event-generator-service")
+@Service
 public class EventGeneratorImpl implements EventGenerator{
     private static final Logger logger = LogManager.getLogger(EventGeneratorImpl.class);
 
@@ -39,7 +46,7 @@ public class EventGeneratorImpl implements EventGenerator{
         customerList.forEach(customer->
             customer.getAccountID().keySet().forEach(sourceBankID->bankList.forEach(bank->
                 bank.work(
-                        getTimestamp(), customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.DEPOSIT, new Faker().number().numberBetween(0,2999999)
+                        EventOperations.getTimestamp(), customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.DEPOSIT, new Faker().number().numberBetween(0,2999999)
                 )
             )));
         //4.withdraw account: 모든 고객에 대해서 랜덤 보유계좌에 출금한다
@@ -48,7 +55,7 @@ public class EventGeneratorImpl implements EventGenerator{
 //                bankDB = BankDB.getInstance().getBankingData(bank.getBankID());
 //                int balance = bankDB.get(customer.getCustomerID()).get(customer.getAccountID(sourceBankID));
                 bank.work(
-                        getTimestamp(), customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.WITHDRAW, new Faker().number().numberBetween(0,2999999)
+                        EventOperations.getTimestamp(), customer.getCustomerID(), sourceBankID, customer.getAccountID(sourceBankID), null, null, null, BankingConstants.WITHDRAW, new Faker().number().numberBetween(0,2999999)
                 );
             })));
         //5.transfer account: 랜덤고객에게 이체한다
@@ -69,7 +76,7 @@ public class EventGeneratorImpl implements EventGenerator{
 
                             try {
                                 bank.work(
-                                        getTimestamp(),
+                                        EventOperations.getTimestamp(),
                                         customerID,
                                         sourceBankID,
                                         sourceAccountID,

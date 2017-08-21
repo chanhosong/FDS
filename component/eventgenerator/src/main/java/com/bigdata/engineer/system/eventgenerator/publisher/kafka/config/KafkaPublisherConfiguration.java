@@ -1,4 +1,4 @@
-package com.bigdata.engineer.event.generator.publisher.kafka.config;
+package com.bigdata.engineer.system.eventgenerator.publisher.kafka.config;
 
 public class KafkaPublisherConfiguration {
 

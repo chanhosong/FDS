@@ -1,4 +1,4 @@
-package com.bigdata.engineer.banking.system.exceptions;
+package com.bigdata.engineer.system.bank.exceptions;
 
 public class TransactionException extends RuntimeException{
     private static final long serialVersionUID = 2944689788691231398L;

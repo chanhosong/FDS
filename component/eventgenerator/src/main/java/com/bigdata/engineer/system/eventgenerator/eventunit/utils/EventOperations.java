@@ -1,4 +1,4 @@
-package com.bigdata.engineer.event.generator.eventunit.utils;
+package com.bigdata.engineer.system.eventgenerator.eventunit.utils;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

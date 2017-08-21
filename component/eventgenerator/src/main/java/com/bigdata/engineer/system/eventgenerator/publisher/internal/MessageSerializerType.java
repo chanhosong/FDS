@@ -1,4 +1,4 @@
-package com.bigdata.engineer.event.generator.publisher.internal;
+package com.bigdata.engineer.system.eventgenerator.publisher.internal;
 
 /**
  * Represents possible message types that can be sent to kafka. 

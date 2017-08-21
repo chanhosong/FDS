@@ -1,4 +1,4 @@
-package com.bigdata.engineer.fds.consumer.config;
+package com.bigdata.engineer.system.fds.config;
 
 public class KafkaConsumerConstants {
     public static final String LOG_APPENDER = "FRAUD_DETECTOR_LOG:: ";

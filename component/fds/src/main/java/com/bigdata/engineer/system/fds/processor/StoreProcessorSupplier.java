@@ -1,8 +1,8 @@
-package com.bigdata.engineer.fds.consumer.processor;
+package com.bigdata.engineer.system.fds.processor;
 
-import com.bigdata.engineer.fds.consumer.config.FDSConstants;
-import com.bigdata.engineer.fds.consumer.config.KafkaConsumerConstants;
-import com.bigdata.engineer.fds.consumer.domain.*;
+import com.bigdata.engineer.system.fds.config.FDSConstants;
+import com.bigdata.engineer.system.fds.config.KafkaConsumerConstants;
+import com.bigdata.engineer.system.fds.domain.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.streams.processor.Processor;
 import org.apache.kafka.streams.processor.ProcessorContext;

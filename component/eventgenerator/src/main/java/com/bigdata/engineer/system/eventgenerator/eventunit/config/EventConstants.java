@@ -1,4 +1,4 @@
-package com.bigdata.engineer.event.generator.eventunit.config;
+package com.bigdata.engineer.system.eventgenerator.eventunit.config;
 
 public class EventConstants {
     public static final String LOG_APPENDER = "CUSTOMER_LOG:: ";

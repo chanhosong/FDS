@@ -6,15 +6,105 @@
 
     <parent>
         <groupId>com.bigdata.engineer.system</groupId>
-        <artifactId>fds-component</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <artifactId>Root-Component</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>${project-base-package}.eventgenerator</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>Bank eventgenerator</name>
+    <name>Event Generator</name>
     <description>Bank EventGenerator Implementation</description>
+    <packaging>bundle</packaging>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <version>${org.apache.felix.src.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-scr-scrdescriptor</id>
+                        <goals>
+                            <goal>scr</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>OSGiEventGeneratorProvider</Bundle-SymbolicName>
+                        <Bundle-Name>${project-base-package}.OSGiEventGeneratorProvider</Bundle-Name>
+                        <Bundle-Activator>${project-base-package}.eventgenerator.Activator</Bundle-Activator>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Bundle-Vendor>ChanHo Song</Bundle-Vendor>
+                        <Private-Package>${project-base-package}.eventgenerator.*</Private-Package>
+                        <Import-Package>
+                            org.osgi.framework,
+                            org.osgi.service.component,
+                            *;resolution:=optional
+                        </Import-Package>
+                        <Export-Package>
+                            org.apache.kafka.clients.*,
+                            ${project-base-package}.bank
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-streams</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.bigdata.engineer.system</groupId>
+            <artifactId>com.bigdata.engineer.system.bank</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.osgi/org.osgi.core -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.felix/org.apache.felix.framework -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-scr-plugin</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.felix/org.apache.felix.scr.annotations -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr.annotations</artifactId>
+        </dependency>
+
+    </dependencies>
     
 </project>

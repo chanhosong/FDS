@@ -1,4 +1,4 @@
-package com.bigdata.engineer.event.generator.eventunit.banking;
+package com.bigdata.engineer.system.eventgenerator.eventunit.banking;
 
 /**
  * 입금 이벤트

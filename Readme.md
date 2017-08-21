@@ -40,4 +40,4 @@ kafka consumer2 start
         
 result
 ---
-![ex_screenshot](./src/main/resources/img/resultScreenshot1.png)
+![ex_screenshot](./feature/src/main/resources/img/resultScreenshot1.png)

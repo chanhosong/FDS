@@ -1,4 +1,4 @@
-package com.bigdata.engineer.banking.system.actor;
+package com.bigdata.engineer.system.bank.actor;
 
 import com.github.javafaker.Faker;
 import org.apache.logging.log4j.LogManager;

@@ -1,4 +1,4 @@
-package com.bigdata.engineer.fds.consumer.domain;
+package com.bigdata.engineer.system.fds.domain;
 
 /**
  * 이체 이벤트

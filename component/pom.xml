@@ -5,21 +5,39 @@
 
     <parent>
         <groupId>com.bigdata.engineer.system</groupId>
-        <artifactId>FDS</artifactId>
+        <artifactId>Root</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <version>1.0.0-SNAPSHOT</version>
-    <artifactId>fds-component</artifactId>
+    <artifactId>Root-Component</artifactId>
     <packaging>pom</packaging>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-scr-plugin</artifactId>
+                    <version>${org.apache.felix.src.version}</version>
+                    <executions>
+                        <execution>
+                            <id>generate-scr-scrdescriptor</id>
+                            <goals>
+                                <goal>scr</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <modules>
         <module>bank</module>
         <module>eventgenerator</module>
         <module>fds</module>
     </modules>
-
-    
 </project>

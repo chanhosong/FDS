@@ -6,8 +6,8 @@
 
     <parent>
         <groupId>com.bigdata.engineer.system</groupId>
-        <artifactId>fds-component</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <artifactId>Root-Component</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -15,8 +15,22 @@
     <version>1.0.0-SNAPSHOT</version>
     <name>Bank System</name>
     <description>Bank System Implementation</description>
+    <packaging>pom</packaging>
 
-
-
-
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+        </dependency>
+    </dependencies>
 </project>

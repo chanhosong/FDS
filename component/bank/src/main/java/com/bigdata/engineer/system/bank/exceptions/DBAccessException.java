@@ -1,4 +1,4 @@
-package com.bigdata.engineer.banking.system.exceptions;
+package com.bigdata.engineer.system.bank.exceptions;
 
 public class DBAccessException extends RuntimeException {
     private static final long serialVersionUID = 7816880162418711344L;

@@ -1,4 +1,4 @@
-package com.bigdata.engineer.banking.system.transaction;
+package com.bigdata.engineer.system.bank.transaction;
 
 public interface Transactions {
     int creditAmount(String timestamp, String customerID, String sourceBankID, String sourceAccountID);

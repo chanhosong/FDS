@@ -1,6 +1,6 @@
-package com.bigdata.engineer.fds.consumer.internal;
+package com.bigdata.engineer.system.fds.internal;
 
-import com.bigdata.engineer.fds.consumer.domain.LogEvent;
+import com.bigdata.engineer.system.fds.domain.LogEvent;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
