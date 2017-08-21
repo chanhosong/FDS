@@ -1,0 +1,48 @@
+package com.bigdata.engineer.banking.system.actor;
+
+import com.bigdata.engineer.banking.system.config.BankingConstants;
+import com.github.javafaker.Faker;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Customer {
+    private static final Logger logger = LogManager.getLogger(Customer.class);
+
+    private String customerID;
+    private Map<String, String> accountID = new HashMap<>();//bankid, accountid
+
+    public Customer() {
+        this.createCustomerID();
+    }
+
+    public String getCustomerID() {
+        return customerID;
+    }
+
+    public Map<String, String> getAccountID() {
+        return accountID;
+    }
+
+    public String getAccountID(String bankID) {
+        return accountID.get(bankID);
+    }
+
+    public int getAccountNumber() {
+        return accountID.size();
+    }
+
+    public void setAccountID(String bankID, String accountID) {
+        this.accountID.put(bankID, accountID);
+    }
+
+    private void createCustomerID() {
+//        this.customerID = EventOperations.randomIdentifier();//EventOperations.getCustomerIDGenerator(30,10);
+        this.customerID = new Faker().name().username();
+        if(logger.isDebugEnabled()){
+            logger.debug(BankingConstants.LOG_APPENDER + "New Customer ID : {}", this.customerID);
+        }
+    }
+}
