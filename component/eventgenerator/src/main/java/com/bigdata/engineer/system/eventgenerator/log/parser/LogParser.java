@@ -23,7 +23,7 @@ public class LogParser implements Runnable{
     private long _filePointer;
     private File _file;
     private static volatile boolean keepRunning = true;
-    private File log = new File("src/main/resources/logs/application.log");
+    private File log = new File(EventConstants.TARGER_LOG_LOCATION);
     private Map<String, String> logTypeFinder = new HashMap<>();
     private static LinkedList<LogListener> listeners = new LinkedList<>();
 

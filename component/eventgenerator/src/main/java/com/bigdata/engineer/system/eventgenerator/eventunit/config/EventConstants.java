@@ -1,6 +1,7 @@
 package com.bigdata.engineer.system.eventgenerator.eventunit.config;
 
 public class EventConstants {
+    public static final String TARGER_LOG_LOCATION = "component/bank/src/main/resources/logs/application.log";
     public static final String LOG_APPENDER = "CUSTOMER_LOG:: ";
     public static final String TAIL_READER_LOG_APPENDER = "TAIL_READER_LOG:: ";
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" packages="com.bigdata.engineer.system">
+<Configuration status="WARN" packages="com.bigdata.engineer.system.eventgenerator">
     <Properties>
-        <Property name="logpath">feature/src/main/resources/logs</Property>
+        <Property name="logpath">component/eventgenerator/src/main/resources/logs</Property>
         <Property name="filename">application</Property>
     </Properties>
 
@@ -25,10 +25,10 @@
             <AppenderRef ref="Console"/>
             <AppenderRef ref="Filelog" level="DEBUG"/>
         </Root>
-        <Logger name="com.bigdata.engineer.system" level="DEBUG">
+        <Logger name="com.bigdata.engineer.system.eventgenerator" level="DEBUG">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="com.bigdata.engineer.system" level="DEBUG">
+        <Logger name="com.bigdata.engineer.system.eventgenerator" level="DEBUG">
             <AppenderRef ref="Filelog" level="DEBUG"/>
         </Logger>
     </Loggers>

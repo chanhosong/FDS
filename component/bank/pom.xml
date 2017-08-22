@@ -15,7 +15,35 @@
     <version>1.0.0-SNAPSHOT</version>
     <name>Bank System</name>
     <description>Bank System Implementation</description>
-    <packaging>pom</packaging>
+    <packaging>bundle</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>OSGiBankProvider</Bundle-SymbolicName>
+                        <Bundle-Name>${project-base-package}.OSGiBankProvider</Bundle-Name>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Bundle-Vendor>ChanHo Song</Bundle-Vendor>
+                        <!--<Private-Package>${project-base-package}.bank.*</Private-Package>-->
+                        <Import-Package>
+                            org.osgi.framework,
+                            org.osgi.service.component,
+                            *;resolution:=optional
+                        </Import-Package>
+                        <Export-Package>
+                            com.github.javafaker.*,
+                            ${project-base-package}.bank.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
@@ -31,6 +59,25 @@
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.osgi/org.osgi.core -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.felix/org.apache.felix.framework -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-scr-plugin</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.felix/org.apache.felix.scr.annotations -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr.annotations</artifactId>
         </dependency>
     </dependencies>
 </project>

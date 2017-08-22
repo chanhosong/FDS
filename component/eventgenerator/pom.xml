@@ -47,11 +47,13 @@
                         <Import-Package>
                             org.osgi.framework,
                             org.osgi.service.component,
-                            *;resolution:=optional
+                            *;resolution:=optional,
+                            ${project-base-package}.bank.*
                         </Import-Package>
                         <Export-Package>
+                            com.github.javafaker.*,
                             org.apache.kafka.clients.*,
-                            ${project-base-package}.bank
+                            ${project-base-package}.eventgenerator.*
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -83,7 +85,6 @@
             <groupId>com.bigdata.engineer.system</groupId>
             <artifactId>com.bigdata.engineer.system.bank</artifactId>
             <version>1.0.0-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.osgi/org.osgi.core -->
         <dependency>
@@ -106,5 +107,5 @@
         </dependency>
 
     </dependencies>
-    
+
 </project>
