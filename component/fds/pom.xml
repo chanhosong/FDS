@@ -47,8 +47,10 @@
                         <Import-Package>
                             org.osgi.framework,
                             org.osgi.service.component,
+                            org.apache.kafka.common.*,
+                            org.apache.kafka.streams.*,
+                            ${project-base-package}.eventgenerator.*,
                             *;resolution:=optional,
-                            ${project-base-package}.eventgenerator.*
                         </Import-Package>
                         <Export-Package>
                             org.apache.kafka.common.*,
@@ -61,6 +63,12 @@
     </build>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${org.apche.kafka.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams -->
         <dependency>
             <groupId>org.apache.kafka</groupId>

@@ -16,6 +16,8 @@ public class Activator implements BundleActivator, ServiceListener {
         logger.info("Starting Fraud Detection Processor...");
         serviceRegistration = bundleContext.registerService(FraudDetectionProcessor.class.getName(), new FraudDetectionProcessorImpl(), null);
 
+        new FraudDetectionProcessorImpl().run();//2.consuming kafka stream event
+
         bundleContext.addServiceListener(this);
     }
 

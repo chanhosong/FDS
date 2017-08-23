@@ -19,6 +19,8 @@ public class Activator implements BundleActivator, ServiceListener {
         context = bundleContext;
         serviceRegistration = bundleContext.registerService(EventGenerator.class.getName(), new EventGeneratorImpl(), null);
 
+        new EventGeneratorImpl().run();//1.create log and publishing event to topic 'bank.events'
+
         bundleContext.addServiceListener(this);
     }
 
