@@ -26,12 +26,8 @@ public class KafkaPublisherApp implements Runnable{
         LogParser logParser = new LogParser(new File("src/main/resources/logs/application.log"));
         logParser.addMsgListener(e->{
             try {
-                try {
-                    kafkaPublisher.produce(1, this.initEvent(e));
-                } catch (ExecutionException | InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            } catch (JsonProcessingException e1) {
+                kafkaPublisher.produce(1, this.initEvent(e));
+            } catch (ExecutionException | InterruptedException | JsonProcessingException e1) {
                 e1.printStackTrace();
             }
         });
