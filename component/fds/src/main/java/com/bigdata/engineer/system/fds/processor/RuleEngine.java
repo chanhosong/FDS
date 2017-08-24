@@ -47,8 +47,7 @@ public class RuleEngine implements ProcessorSupplier<String, Map<String , Map<St
                 // call this processor's punctuate() method every 1000 milliseconds.
                 this.context.schedule(1000);
                 // retrieve the key-value store named "FraudStore"
-                this.NewAccountEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(
-                        KafkaConsumerConstants.FRAUDSTORE_NEWACCOUNT);
+                this.NewAccountEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(KafkaConsumerConstants.FRAUDSTORE_NEWACCOUNT);
                 this.DepositEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(KafkaConsumerConstants.FRAUDSTORE_DEPOSITEVENT);
                 this.WithdrawEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(KafkaConsumerConstants.FRAUDSTORE_WITHDRAWEVENT);
                 this.TransferEventStore = (KeyValueStore<String, Map<String, LogEvent>>) context.getStateStore(KafkaConsumerConstants.FRAUDSTORE_TRANSFEREVENT);
