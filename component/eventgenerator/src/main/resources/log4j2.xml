@@ -10,7 +10,7 @@
             <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %logger{36} : %msg%n"/>
         </Console>
 
-        <RollingFile name="Filelog" fileName="${logpath}/${filename}.log" filePattern="${logpath}/${filename}.%d{yyyy-MM-dd}.logs.gz">
+        <RollingFile name="Filelog" fileName="${logpath}/${filename}.log" filePattern="${logpath}/${filename}.%d{yyyy-MM-dd}.log.gz">
             <PatternLayout>
                 <pattern>%d %5p [%c] %m%n</pattern>
             </PatternLayout>
